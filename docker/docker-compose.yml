@@ -1,0 +1,12 @@
+version: "3"
+services:
+  postgres:
+    image: postgres:12.10-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: fire-inventory
+      POSTGRES_PASSWORD: fire-inventory
+      POSTGRES_DB: fire-inventory
+      TZ: UTC
+      PGTZ: UTC
