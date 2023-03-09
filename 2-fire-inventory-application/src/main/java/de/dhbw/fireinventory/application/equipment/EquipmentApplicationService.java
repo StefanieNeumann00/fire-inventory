@@ -24,4 +24,9 @@ public class EquipmentApplicationService {
     public void saveEquipment(Equipment equipment) {
         this.equipmentRepository.save(equipment);
     }
+
+    public void deleteEquipment(Equipment equipment)
+    {
+        this.equipmentRepository.delete(equipment);
+    }
 }

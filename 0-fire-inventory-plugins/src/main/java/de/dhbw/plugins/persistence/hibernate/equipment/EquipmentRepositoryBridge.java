@@ -31,4 +31,9 @@ public class EquipmentRepositoryBridge implements EquipmentRepository {
     public Equipment save(final Equipment equipment) {
         return this.springDataEquipmentRepository.save(equipment);
     }
+
+    @Override
+    public void delete(final Equipment equipment){
+        this.springDataEquipmentRepository.delete(equipment);
+    }
 }

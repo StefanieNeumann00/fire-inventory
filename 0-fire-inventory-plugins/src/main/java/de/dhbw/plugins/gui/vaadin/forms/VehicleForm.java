@@ -1,8 +1,12 @@
 package de.dhbw.plugins.gui.vaadin.forms;
 
+import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -21,6 +25,8 @@ public class VehicleForm extends Dialog implements FormDialog {
     StatusApplicationService statusService;
     TextField designationTextField = new TextField("Designation");
     ComboBox<Place> placeComboBox = new ComboBox<>("Place");
+    Button save = new Button("Save");
+    Button close = new Button("Cancel");
     Binder<Vehicle> binder = new BeanValidationBinder<>(Vehicle.class);
     private Vehicle vehicle = new Vehicle();
 
@@ -52,6 +58,19 @@ public class VehicleForm extends Dialog implements FormDialog {
         textFieldLayout.add(designationTextField, placeComboBox, conditionRadioGroup);
         textFieldLayout.setAlignItems(FlexComponent.Alignment.CENTER);
         return textFieldLayout;
+    }
+
+    private HorizontalLayout createButtonsLayout() {
+        save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+
+        save.addClickShortcut(Key.ENTER);
+        close.addClickShortcut(Key.ESCAPE);
+
+        save.addClickListener(event -> validateAndSave());
+        close.addClickListener(event -> closeDialog());
+
+        return new HorizontalLayout(save, close);
     }
 
     private void setVehicleStatus()

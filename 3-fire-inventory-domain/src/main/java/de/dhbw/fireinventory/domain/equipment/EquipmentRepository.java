@@ -9,4 +9,6 @@ public interface EquipmentRepository {
     List<Equipment> findEquipmentWithDesignation(String designation);
 
     Equipment save(Equipment equipment);
+
+    void delete(Equipment equipment);
 }
