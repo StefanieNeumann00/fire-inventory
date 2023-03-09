@@ -8,6 +8,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
+import de.dhbw.fireinventory.application.status.StatusApplicationService;
 import de.dhbw.fireinventory.application.vehicle.VehicleApplicationService;
 import de.dhbw.fireinventory.domain.place.Place;
 import de.dhbw.fireinventory.domain.status.Status;
@@ -16,25 +17,25 @@ import de.dhbw.fireinventory.domain.vehicle.Vehicle;
 import java.util.List;
 
 public class VehicleForm extends Dialog implements FormDialog {
-    VehicleApplicationService service;
-    TextField designation = new TextField("Designation");
-    ComboBox<Status> status = new ComboBox<>("Status");
-    ComboBox<Place> place = new ComboBox<>("Place");
+    VehicleApplicationService vehicleService;
+    StatusApplicationService statusService;
+    TextField designationTextField = new TextField("Designation");
+    ComboBox<Place> placeComboBox = new ComboBox<>("Place");
     Binder<Vehicle> binder = new BeanValidationBinder<>(Vehicle.class);
     private Vehicle vehicle = new Vehicle();
 
-    public VehicleForm(List<Place> places, List<Status> statuses, VehicleApplicationService service) {
-        this.service = service;
+    public VehicleForm(List<Place> places, StatusApplicationService statusService, VehicleApplicationService vehicleService) {
+        this.vehicleService = vehicleService;
+        this.statusService = statusService;
         this.setResizable(true);
         this.setDraggable(true);
 
-        place.setItems(places);
-        place.setItemLabelGenerator(Place::getDesignation);
-        status.setItems(statuses);
-        status.setItemLabelGenerator(Status::getDesignation);
+        placeComboBox.setItems(places);
+        placeComboBox.setItemLabelGenerator(Place::getDesignation);
 
         add(this.createTextFieldLayout(),createButtonsLayout());
-        binder.bindInstanceFields(this);
+        binder.bind(designationTextField, "designation");
+        binder.bind(placeComboBox, "place");
         binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
 
     }
@@ -47,15 +48,50 @@ public class VehicleForm extends Dialog implements FormDialog {
     private VerticalLayout createTextFieldLayout()
     {
         VerticalLayout textFieldLayout = new VerticalLayout();
-        textFieldLayout.add(designation, place, status);
+        this.createConditionRadioButton();
+        textFieldLayout.add(designationTextField, placeComboBox, conditionRadioGroup);
         textFieldLayout.setAlignItems(FlexComponent.Alignment.CENTER);
         return textFieldLayout;
+    }
+
+    private void setVehicleStatus()
+    {
+        String conditionValue = conditionRadioGroup.getValue();
+        Place place = vehicle.getPlace();
+        Status status = statusService.getStatusByDesignation("Einsatzbereit");
+        String placeDesignation = "";
+
+        if(place != null) {
+            placeDesignation = place.getDesignation();
+        }
+
+        if(conditionValue == "funktionsfähig")
+        {
+            if(placeDesignation == "Abwesend")
+            {
+                status = statusService.getStatusByDesignation("Nicht vor Ort");
+            }
+        }
+        else
+        {
+            if(placeDesignation == "Abwesend")
+            {
+                status = statusService.getStatusByDesignation("In Reparatur");
+            }
+            else
+            {
+                status = statusService.getStatusByDesignation("Kaputt");
+            }
+        }
+
+        vehicle.setStatus(status);
     }
 
     public void validateAndSave() {
         try {
             binder.writeBean(vehicle);
-            service.saveVehicle(vehicle);
+            setVehicleStatus();
+            vehicleService.saveVehicle(vehicle);
             this.close();
         } catch (ValidationException e) {
             e.printStackTrace();

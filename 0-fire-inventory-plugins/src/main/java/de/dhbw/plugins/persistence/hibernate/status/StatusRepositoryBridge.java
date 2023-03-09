@@ -25,6 +25,10 @@ public class StatusRepositoryBridge implements StatusRepository {
         return this.springDataStatusRepository.findAll();
     }
 
+    @Override
+    public Status getStatusByDesignation(String designation) {
+        return this.springDataStatusRepository.getStatusByDesignation(designation);
+    }
 
     @Override
     public Status save(final Status status) {

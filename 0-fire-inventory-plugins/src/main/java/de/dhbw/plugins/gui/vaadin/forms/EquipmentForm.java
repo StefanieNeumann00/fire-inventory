@@ -5,42 +5,88 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
+import com.vaadin.flow.component.radiobutton.RadioGroupVariant;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
-import de.dhbw.fireinventory.adapter.location.LocationResource;
-import de.dhbw.fireinventory.adapter.status.StatusResource;
 import de.dhbw.fireinventory.application.equipment.EquipmentApplicationService;
+import de.dhbw.fireinventory.application.status.StatusApplicationService;
 import de.dhbw.fireinventory.domain.equipment.Equipment;
 import de.dhbw.fireinventory.domain.location.Location;
 import de.dhbw.fireinventory.domain.status.Status;
-import de.dhbw.plugins.rest.EquipmentController;
 
 import java.util.List;
 
 public class EquipmentForm extends Dialog implements FormDialog {
-        EquipmentApplicationService service;
-        TextField designation = new TextField("Designation");
-        ComboBox<Status> status = new ComboBox<>("Status");
-        ComboBox<Location> location = new ComboBox<>("Location");
+        EquipmentApplicationService equipmentService;
+        StatusApplicationService statusService;
+        TextField designationTextField = new TextField("Designation");
+        ComboBox<Location> locationComboBox = new ComboBox<>("Location");
 
         Binder<Equipment> binder = new BeanValidationBinder<>(Equipment.class);
         private Equipment equipment = new Equipment();
 
-        public EquipmentForm(List<Location> locations, List<Status> statuses, EquipmentApplicationService service) {
-            this.service = service;
+        public EquipmentForm(List<Location> locations, StatusApplicationService statusService, EquipmentApplicationService equipmentService) {
+            this.equipmentService = equipmentService;
+            this.statusService = statusService;
             this.setResizable(true);
             this.setDraggable(true);
 
-            location.setItems(locations);
-            location.setItemLabelGenerator(Location::getDesignation);
-            status.setItems(statuses);
-            status.setItemLabelGenerator(Status::getDesignation);
+            locationComboBox.setItems(locations);
+            locationComboBox.setItemLabelGenerator(Location::getDesignation);
 
             add(createTextFieldLayout(),createButtonsLayout());
-            binder.bindInstanceFields(this);
+            binder.bind(designationTextField, "designation");
+            binder.bind(locationComboBox, "location");
             binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
+        }
+
+        private void setEquipmentStatus()
+        {
+            String conditionValue = conditionRadioGroup.getValue();
+            Location location = equipment.getLocation();
+            Status status = statusService.getStatusByDesignation("Nicht vor Ort");
+
+            if(conditionValue == "funktionsfähig")
+            {
+                if(location.getVehicle() != null) {
+                    String vehicleStatusDesignation = location.getVehicle().getStatus().getDesignation();
+
+                    switch (vehicleStatusDesignation) {
+                        case "Einsatzbereit":
+                            status = statusService.getStatusByDesignation("Einsatzbereit");
+                            break;
+                        case "Kaputt":
+                            status = statusService.getStatusByDesignation("Vor Ort");
+                            break;
+                    }
+                }
+                else if(location.getPlace() != null) {
+                    String placeDesignation = location.getPlace().getDesignation();
+
+                    if(placeDesignation != "Abwesend")
+                    {
+                        status = statusService.getStatusByDesignation("Vor Ort");
+                    }
+                }
+            }
+            else
+            {
+                status = statusService.getStatusByDesignation("Kaputt");
+
+                if(location.getVehicle() != null) {
+                    String vehicleStatusDesignation = location.getVehicle().getStatus().getDesignation();
+
+                    if(vehicleStatusDesignation == "In Reparatur")
+                    {
+                        status = statusService.getStatusByDesignation("In Reparatur");
+                    }
+                }
+            }
+
+            equipment.setStatus(status);
         }
 
         public void setEquipment(Equipment equipment) {
@@ -51,7 +97,8 @@ public class EquipmentForm extends Dialog implements FormDialog {
         private Component createTextFieldLayout()
         {
             VerticalLayout textFieldLayout = new VerticalLayout();
-            textFieldLayout.add(designation, location, status);
+            this.createConditionRadioButton();
+            textFieldLayout.add(designationTextField, locationComboBox, conditionRadioGroup);
             textFieldLayout.setAlignItems(FlexComponent.Alignment.CENTER);
 
             return textFieldLayout;
@@ -60,7 +107,8 @@ public class EquipmentForm extends Dialog implements FormDialog {
         public void validateAndSave() {
             try {
                 binder.writeBean(equipment);
-                service.saveEquipment(equipment);
+                setEquipmentStatus();
+                equipmentService.saveEquipment(equipment);
                 this.close();
             } catch (ValidationException e) {
                 e.printStackTrace();

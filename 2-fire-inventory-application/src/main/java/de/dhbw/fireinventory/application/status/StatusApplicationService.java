@@ -23,4 +23,6 @@ public class StatusApplicationService {
     }
 
     public void saveStatus(Status status){ this.statusRepository.save(status); }
+
+    public Status getStatusByDesignation(String designation) { return this.statusRepository.getStatusByDesignation(designation); }
 }

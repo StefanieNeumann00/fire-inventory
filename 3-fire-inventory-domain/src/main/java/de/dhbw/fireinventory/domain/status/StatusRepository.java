@@ -8,5 +8,7 @@ public interface StatusRepository {
 
     List<Status> findAllStatuses();
 
+    Status getStatusByDesignation(String designation);
+
     Status save(Status status);
 }

@@ -96,10 +96,10 @@ public class EquipmentOverview extends VerticalLayout {
     {
         switch (object) {
             case "Equipment":
-                form = new EquipmentForm(locationService.findAllLocations(), statusService.findAllStatuses(), equipmentService);
+                form = new EquipmentForm(locationService.findAllLocations(), statusService, equipmentService);
                 break;
             case "Vehicle":
-                form = new VehicleForm(placeService.findAllPlaces(), statusService.findAllStatuses(), vehicleService);
+                form = new VehicleForm(placeService.findAllPlaces(), statusService, vehicleService);
                 break;
             case "Place":
                 form = new PlaceForm(placeService);
