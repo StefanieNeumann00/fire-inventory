@@ -1,4 +1,4 @@
-package de.dhbw.plugins.gui.vaadin;
+package de.dhbw.plugins.gui.vaadin.routes;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
@@ -10,8 +10,15 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.PWA;
 import de.dhbw.fireinventory.adapter.equipment.EquipmentResource;
+import de.dhbw.fireinventory.application.equipment.EquipmentApplicationService;
+import de.dhbw.fireinventory.application.location.LocationApplicationService;
+import de.dhbw.fireinventory.application.place.PlaceApplicationService;
+import de.dhbw.fireinventory.application.status.StatusApplicationService;
+import de.dhbw.fireinventory.application.vehicle.VehicleApplicationService;
 import de.dhbw.fireinventory.domain.equipment.Equipment;
+import de.dhbw.plugins.gui.vaadin.MainLayout;
 import de.dhbw.plugins.gui.vaadin.forms.EquipmentForm;
 import de.dhbw.plugins.gui.vaadin.forms.PlaceForm;
 import de.dhbw.plugins.gui.vaadin.forms.VehicleForm;
@@ -21,23 +28,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Route(value="", layout = MainLayout.class)
 @PageTitle("Overview | FireInventory")
 public class EquipmentOverview extends VerticalLayout {
-    Grid<EquipmentResource> grid = new Grid<>(EquipmentResource.class, false);
+    Grid<Equipment> grid = new Grid<>(Equipment.class, false);
     TextField filterText = new TextField();
     Dialog form;
-    EquipmentController equipmentController;
-    LocationController locationController;
-    PlaceController placeController;
-    StatusController statusController;
-    VehicleController vehicleController;
+    EquipmentApplicationService equipmentService;
+    LocationApplicationService locationService;
+    PlaceApplicationService placeService;
+    StatusApplicationService statusService;
+    VehicleApplicationService vehicleService;
 
     @Autowired
-    public EquipmentOverview(EquipmentController equipmentController, LocationController locationController, PlaceController placeController, StatusController statusController, VehicleController vehicleController)
+    public EquipmentOverview(EquipmentApplicationService equipmentService, LocationApplicationService locationService, PlaceApplicationService placeService, StatusApplicationService statusService, VehicleApplicationService vehicleService)
     {
-        this.vehicleController = vehicleController;
-        this.equipmentController = equipmentController;
-        this.locationController = locationController;
-        this.statusController = statusController;
-        this.placeController = placeController;
+        this.equipmentService = equipmentService;
+        this.locationService = locationService;
+        this.placeService = placeService;
+        this.statusService = statusService;
+        this.vehicleService = vehicleService;
         addClassName("overview");
         setSizeFull();
         configureGrid();
@@ -55,7 +62,7 @@ public class EquipmentOverview extends VerticalLayout {
     }
 
     private void configureGrid() {
-        grid.addColumn(EquipmentResource::getDesignation).setHeader("Bezeichnung");
+        grid.addColumn(Equipment::getDesignation).setHeader("Bezeichnung");
         grid.addColumn(e -> e.getLocation().getDesignation()).setHeader("Ablageort");
         grid.addColumn(e -> e.getStatus().getDesignation()).setHeader("Status");
         grid.addClassNames("equipment-grid");
@@ -82,20 +89,20 @@ public class EquipmentOverview extends VerticalLayout {
     }
 
     private void updateList() {
-        grid.setItems(equipmentController.getEquipments());
+        grid.setItems(equipmentService.findAllEquipments());
     }
 
     private void openFormDialog(String object)
     {
         switch (object) {
             case "Equipment":
-                form = new EquipmentForm(locationController.getLocations(), statusController.getStatuses(), equipmentController);
+                form = new EquipmentForm(locationService.findAllLocations(), statusService.findAllStatuses(), equipmentService);
                 break;
             case "Vehicle":
-                form = new VehicleForm(placeController.getPlaces(), statusController.getStatuses(), vehicleController);
+                form = new VehicleForm(placeService.findAllPlaces(), statusService.findAllStatuses(), vehicleService);
                 break;
             case "Place":
-                form = new PlaceForm(placeController);
+                form = new PlaceForm(placeService);
                 break;
         }
         form.open();

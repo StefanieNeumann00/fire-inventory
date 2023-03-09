@@ -6,16 +6,12 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
-import de.dhbw.fireinventory.domain.location.Location;
+import de.dhbw.fireinventory.application.place.PlaceApplicationService;
 import de.dhbw.fireinventory.domain.place.Place;
-import de.dhbw.fireinventory.domain.status.Status;
-import de.dhbw.plugins.rest.EquipmentController;
 import de.dhbw.plugins.rest.PlaceController;
 
-import java.util.List;
-
 public class PlaceForm extends Dialog implements FormDialog {
-    PlaceController controller;
+    PlaceApplicationService service;
     TextField designation = new TextField("Designation");
 
     Button save = new Button("Save");
@@ -23,8 +19,8 @@ public class PlaceForm extends Dialog implements FormDialog {
     Binder<Place> binder = new BeanValidationBinder<>(Place.class);
     private Place place = new Place();
 
-    public PlaceForm(PlaceController controller) {
-        this.controller = controller;
+    public PlaceForm(PlaceApplicationService service) {
+        this.service = service;
         this.setResizable(true);
         this.setDraggable(true);
 
@@ -41,7 +37,7 @@ public class PlaceForm extends Dialog implements FormDialog {
     public void validateAndSave() {
         try {
             binder.writeBean(place);
-            controller.addPlace(place);
+            service.savePlace(place);
             this.close();
         } catch (ValidationException e) {
             e.printStackTrace();

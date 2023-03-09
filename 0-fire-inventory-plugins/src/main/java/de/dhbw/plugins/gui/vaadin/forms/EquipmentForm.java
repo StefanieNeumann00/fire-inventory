@@ -11,6 +11,7 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import de.dhbw.fireinventory.adapter.location.LocationResource;
 import de.dhbw.fireinventory.adapter.status.StatusResource;
+import de.dhbw.fireinventory.application.equipment.EquipmentApplicationService;
 import de.dhbw.fireinventory.domain.equipment.Equipment;
 import de.dhbw.fireinventory.domain.location.Location;
 import de.dhbw.fireinventory.domain.status.Status;
@@ -19,23 +20,23 @@ import de.dhbw.plugins.rest.EquipmentController;
 import java.util.List;
 
 public class EquipmentForm extends Dialog implements FormDialog {
-        EquipmentController controller;
+        EquipmentApplicationService service;
         TextField designation = new TextField("Designation");
-        ComboBox<StatusResource> status = new ComboBox<>("Status");
-        ComboBox<LocationResource> location = new ComboBox<>("Location");
+        ComboBox<Status> status = new ComboBox<>("Status");
+        ComboBox<Location> location = new ComboBox<>("Location");
 
         Binder<Equipment> binder = new BeanValidationBinder<>(Equipment.class);
         private Equipment equipment = new Equipment();
 
-        public EquipmentForm(List<LocationResource> locations, List<StatusResource> statuses, EquipmentController controller) {
-            this.controller = controller;
+        public EquipmentForm(List<Location> locations, List<Status> statuses, EquipmentApplicationService service) {
+            this.service = service;
             this.setResizable(true);
             this.setDraggable(true);
 
             location.setItems(locations);
-            location.setItemLabelGenerator(LocationResource::getDesignation);
+            location.setItemLabelGenerator(Location::getDesignation);
             status.setItems(statuses);
-            status.setItemLabelGenerator(StatusResource::getDesignation);
+            status.setItemLabelGenerator(Status::getDesignation);
 
             add(createTextFieldLayout(),createButtonsLayout());
             binder.bindInstanceFields(this);
@@ -59,7 +60,7 @@ public class EquipmentForm extends Dialog implements FormDialog {
         public void validateAndSave() {
             try {
                 binder.writeBean(equipment);
-                controller.addEquipment(equipment);
+                service.saveEquipment(equipment);
                 this.close();
             } catch (ValidationException e) {
                 e.printStackTrace();

@@ -2,6 +2,7 @@ package de.dhbw.fireinventory.application.equipment;
 
 import de.dhbw.fireinventory.domain.equipment.Equipment;
 import de.dhbw.fireinventory.domain.equipment.EquipmentRepository;
+import de.dhbw.fireinventory.domain.location.Location;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,5 +21,7 @@ public class EquipmentApplicationService {
         return this.equipmentRepository.findAllEquipments();
     }
 
-    public void saveEquipment(Equipment equipment) { this.equipmentRepository.save(equipment); }
+    public void saveEquipment(Equipment equipment) {
+        this.equipmentRepository.save(equipment);
+    }
 }

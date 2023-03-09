@@ -1,4 +1,4 @@
-package de.dhbw.plugins.gui.vaadin;
+package de.dhbw.plugins.gui.vaadin.routes;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.charts.Chart;
 import com.vaadin.flow.component.charts.model.ChartType;
@@ -8,6 +8,7 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import de.dhbw.plugins.gui.vaadin.MainLayout;
 import de.dhbw.plugins.rest.EquipmentController;
 
 @Route(value = "dashboard", layout = MainLayout.class)

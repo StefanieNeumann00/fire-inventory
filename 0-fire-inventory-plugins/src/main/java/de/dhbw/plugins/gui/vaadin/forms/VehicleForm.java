@@ -8,34 +8,30 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
-import de.dhbw.fireinventory.adapter.place.PlaceResource;
-import de.dhbw.fireinventory.adapter.status.StatusResource;
-import de.dhbw.fireinventory.domain.equipment.Equipment;
-import de.dhbw.fireinventory.domain.location.Location;
+import de.dhbw.fireinventory.application.vehicle.VehicleApplicationService;
 import de.dhbw.fireinventory.domain.place.Place;
 import de.dhbw.fireinventory.domain.status.Status;
 import de.dhbw.fireinventory.domain.vehicle.Vehicle;
-import de.dhbw.plugins.rest.EquipmentController;
-import de.dhbw.plugins.rest.VehicleController;
+
 import java.util.List;
 
 public class VehicleForm extends Dialog implements FormDialog {
-    VehicleController controller;
+    VehicleApplicationService service;
     TextField designation = new TextField("Designation");
-    ComboBox<StatusResource> status = new ComboBox<>("Status");
-    ComboBox<PlaceResource> place = new ComboBox<>("Place");
+    ComboBox<Status> status = new ComboBox<>("Status");
+    ComboBox<Place> place = new ComboBox<>("Place");
     Binder<Vehicle> binder = new BeanValidationBinder<>(Vehicle.class);
     private Vehicle vehicle = new Vehicle();
 
-    public VehicleForm(List<PlaceResource> places, List<StatusResource> statuses, VehicleController controller) {
-        this.controller = controller;
+    public VehicleForm(List<Place> places, List<Status> statuses, VehicleApplicationService service) {
+        this.service = service;
         this.setResizable(true);
         this.setDraggable(true);
 
         place.setItems(places);
-        place.setItemLabelGenerator(PlaceResource::getDesignation);
+        place.setItemLabelGenerator(Place::getDesignation);
         status.setItems(statuses);
-        status.setItemLabelGenerator(StatusResource::getDesignation);
+        status.setItemLabelGenerator(Status::getDesignation);
 
         add(this.createTextFieldLayout(),createButtonsLayout());
         binder.bindInstanceFields(this);
@@ -59,7 +55,7 @@ public class VehicleForm extends Dialog implements FormDialog {
     public void validateAndSave() {
         try {
             binder.writeBean(vehicle);
-            controller.addVehicle(vehicle);
+            service.saveVehicle(vehicle);
             this.close();
         } catch (ValidationException e) {
             e.printStackTrace();

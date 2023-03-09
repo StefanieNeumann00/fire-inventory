@@ -8,6 +8,8 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.HighlightConditions;
 import com.vaadin.flow.router.RouterLink;
+import de.dhbw.plugins.gui.vaadin.routes.Dashboard;
+import de.dhbw.plugins.gui.vaadin.routes.EquipmentOverview;
 
 public class MainLayout extends AppLayout {
 
