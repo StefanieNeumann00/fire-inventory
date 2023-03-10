@@ -1,9 +1,7 @@
 package de.dhbw.plugins.persistence.hibernate.place;
 
-import de.dhbw.fireinventory.domain.location.Location;
 import de.dhbw.fireinventory.domain.place.Place;
 import de.dhbw.fireinventory.domain.place.PlaceRepository;
-import de.dhbw.plugins.persistence.hibernate.location.SpringDataLocationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 

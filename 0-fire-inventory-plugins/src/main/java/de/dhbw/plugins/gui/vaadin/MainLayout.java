@@ -8,6 +8,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.HighlightConditions;
 import com.vaadin.flow.router.RouterLink;
+import com.vaadin.flow.theme.lumo.LumoUtility;
 import de.dhbw.plugins.gui.vaadin.routes.Dashboard;
 import de.dhbw.plugins.gui.vaadin.routes.EquipmentOverview;
 
@@ -20,7 +21,9 @@ public class MainLayout extends AppLayout {
 
     private void createHeader() {
         H1 logo = new H1("FireInventory");
-        logo.addClassNames("text-l", "m-m");
+        logo.addClassNames(
+                LumoUtility.FontSize.LARGE,
+                LumoUtility.Margin.MEDIUM);
 
         HorizontalLayout header = new HorizontalLayout(
                 new DrawerToggle(),
@@ -29,7 +32,9 @@ public class MainLayout extends AppLayout {
 
         header.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
         header.setWidth("100%");
-        header.addClassNames("py-0", "px-m");
+        header.addClassNames(
+                LumoUtility.Padding.Vertical.NONE,
+                LumoUtility.Padding.Horizontal.MEDIUM);
 
         addToNavbar(header);
 

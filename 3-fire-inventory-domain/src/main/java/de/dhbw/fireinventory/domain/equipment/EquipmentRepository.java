@@ -4,9 +4,7 @@ import java.util.List;
 
 public interface EquipmentRepository {
 
-    List<Equipment> findAllEquipments();
-
-    List<Equipment> findEquipmentWithDesignation(String designation);
+    List<Equipment> findAllBy(String filterText);
 
     Equipment save(Equipment equipment);
 

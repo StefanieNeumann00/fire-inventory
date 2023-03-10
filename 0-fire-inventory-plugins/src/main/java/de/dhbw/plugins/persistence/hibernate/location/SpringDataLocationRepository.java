@@ -1,6 +1,5 @@
 package de.dhbw.plugins.persistence.hibernate.location;
 
-import de.dhbw.fireinventory.domain.equipment.Equipment;
 import de.dhbw.fireinventory.domain.location.Location;
 import org.springframework.data.jpa.repository.JpaRepository;
 

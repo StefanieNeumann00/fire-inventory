@@ -5,8 +5,6 @@ import de.dhbw.fireinventory.adapter.equipment.EquipmentToEquipmentResourceMappe
 import de.dhbw.fireinventory.application.equipment.EquipmentApplicationService;
 import de.dhbw.fireinventory.domain.equipment.Equipment;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -31,7 +29,7 @@ public class EquipmentController {
 
     @RequestMapping(method = RequestMethod.GET)
     public List<EquipmentResource> getEquipments() {
-        return this.equipmentApplicationService.findAllEquipments().stream()
+        return this.equipmentApplicationService.findAllEquipments(null).stream()
                 .map(equipmentToEquipmentResourceMapper)
                 .collect(Collectors.toList());
     }

@@ -1,8 +1,6 @@
 package de.dhbw.plugins.gui.vaadin.routes;
 
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -10,8 +8,6 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.PWA;
-import de.dhbw.fireinventory.adapter.equipment.EquipmentResource;
 import de.dhbw.fireinventory.application.equipment.EquipmentApplicationService;
 import de.dhbw.fireinventory.application.location.LocationApplicationService;
 import de.dhbw.fireinventory.application.place.PlaceApplicationService;
@@ -22,9 +18,8 @@ import de.dhbw.fireinventory.domain.location.Location;
 import de.dhbw.fireinventory.domain.status.Status;
 import de.dhbw.plugins.gui.vaadin.MainLayout;
 import de.dhbw.plugins.gui.vaadin.forms.EquipmentForm;
-import de.dhbw.plugins.gui.vaadin.forms.PlaceForm;
 import de.dhbw.plugins.gui.vaadin.forms.VehicleForm;
-import de.dhbw.plugins.rest.*;
+import de.dhbw.plugins.gui.vaadin.forms.PlaceForm;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Route(value="", layout = MainLayout.class)
@@ -59,7 +54,7 @@ public class EquipmentOverview extends VerticalLayout {
         closeEquipmentEditor();
     }
 
-    private Component getContent() {
+    private HorizontalLayout getContent() {
         HorizontalLayout content = new HorizontalLayout(grid, equipmentForm);
         content.setFlexGrow(2, grid);
         content.setFlexGrow(1, equipmentForm);
@@ -68,19 +63,31 @@ public class EquipmentOverview extends VerticalLayout {
         return content;
     }
 
+    private void configureEquipmentForm() {
+        equipmentForm = new EquipmentForm(locationService.findAllLocations());
+        equipmentForm.setWidth("25em");
+        equipmentForm.addListener(EquipmentForm.SaveEvent.class, this::saveEquipment);
+        equipmentForm.addListener(EquipmentForm.DeleteEvent.class, this::deleteEquipment);
+        equipmentForm.addListener(EquipmentForm.CloseEvent.class, e -> closeEquipmentEditor());
+    }
+
     private void configureGrid() {
-        grid.addColumn(Equipment::getDesignation).setHeader("Bezeichnung");
-        grid.addColumn(e -> e.getLocation().getDesignation()).setHeader("Ablageort");
-        grid.addColumn(e -> e.getStatus().getDesignation()).setHeader("Status");
         grid.addClassNames("equipment-grid");
         grid.setSizeFull();
         grid.getColumns().forEach(col -> col.setAutoWidth(true));
+        grid.addColumn(Equipment::getDesignation).setHeader("Bezeichnung");
+        grid.addColumn(e -> e.getLocation().getDesignation()).setHeader("Ablageort");
+        grid.addColumn(e -> e.getStatus().getDesignation()).setHeader("Status");
+
+        grid.asSingleSelect().addValueChangeListener(event ->
+                editEquipment(event.getValue()));
     }
 
     private HorizontalLayout getToolbar() {
         filterText.setPlaceholder("Filter by name...");
         filterText.setClearButtonVisible(true);
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
+        filterText.addValueChangeListener(e -> updateList());
 
         Button addEquipmentButton = new Button("Add Equipment");
         Button addVehicleButton = new Button("Add Vehicle");
@@ -105,21 +112,19 @@ public class EquipmentOverview extends VerticalLayout {
         }
     }
 
+    private void closeEquipmentEditor() {
+        equipmentForm.setEquipment(null);
+        equipmentForm.setVisible(false);
+        removeClassName("editing");
+    }
+
     private void addEquipment() {
         grid.asSingleSelect().clear();
         editEquipment(new Equipment());
     }
 
     private void updateList() {
-        grid.setItems(equipmentService.findAllEquipments());
-    }
-
-    private void configureEquipmentForm() {
-        equipmentForm = new EquipmentForm(locationService.findAllLocations());
-        equipmentForm.setWidth("25em");
-        equipmentForm.addListener(EquipmentForm.SaveEvent.class, this::saveEquipment);
-        equipmentForm.addListener(EquipmentForm.DeleteEvent.class, this::deleteEquipment);
-        equipmentForm.addListener(EquipmentForm.CloseEvent.class, e -> closeEquipmentEditor());
+        grid.setItems(equipmentService.findAllEquipments(filterText.getValue()));
     }
 
     private void saveEquipment(EquipmentForm.SaveEvent event) {
@@ -181,11 +186,5 @@ public class EquipmentOverview extends VerticalLayout {
 
         equipment.setStatus(status);
         return equipment;
-    }
-
-    private void closeEquipmentEditor() {
-        equipmentForm.setEquipment(null);
-        equipmentForm.setVisible(false);
-        removeClassName("editing");
     }
 }

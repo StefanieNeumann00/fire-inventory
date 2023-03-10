@@ -1,12 +1,8 @@
 package de.dhbw.plugins.rest;
 
-import de.dhbw.fireinventory.adapter.status.StatusResource;
-import de.dhbw.fireinventory.adapter.status.StatusToStatusResourceMapper;
 import de.dhbw.fireinventory.adapter.vehicle.VehicleResource;
 import de.dhbw.fireinventory.adapter.vehicle.VehicleToVehicleResourceMapper;
-import de.dhbw.fireinventory.application.status.StatusApplicationService;
 import de.dhbw.fireinventory.application.vehicle.VehicleApplicationService;
-import de.dhbw.fireinventory.domain.location.Location;
 import de.dhbw.fireinventory.domain.vehicle.Vehicle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;

@@ -1,6 +1,5 @@
 package de.dhbw.plugins.gui.vaadin.forms;
 
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
@@ -10,7 +9,6 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
@@ -34,8 +32,9 @@ public class EquipmentForm extends FormLayout implements FormDialog {
 
             locationComboBox.setItems(locations);
             locationComboBox.setItemLabelGenerator(Location::getDesignation);
+            createConditionRadioButton();
 
-            add(createTextFieldLayout(),createButtonsLayout());
+            add(designationTextField, locationComboBox, conditionRadioGroup, createButtonsLayout());
             binder.bind(designationTextField, "designation");
             binder.bind(locationComboBox, "location");
             binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
@@ -44,16 +43,6 @@ public class EquipmentForm extends FormLayout implements FormDialog {
         public void setEquipment(Equipment equipment) {
             this.equipment = equipment;
             binder.readBean(equipment);
-        }
-
-        private Component createTextFieldLayout()
-        {
-            VerticalLayout textFieldLayout = new VerticalLayout();
-            this.createConditionRadioButton();
-            textFieldLayout.add(designationTextField, locationComboBox, conditionRadioGroup);
-            textFieldLayout.setAlignItems(FlexComponent.Alignment.CENTER);
-
-            return textFieldLayout;
         }
 
         private HorizontalLayout createButtonsLayout() {
@@ -68,7 +57,10 @@ public class EquipmentForm extends FormLayout implements FormDialog {
             delete.addClickListener(event -> fireEvent(new DeleteEvent(this, equipment)));
             cancel.addClickListener(event -> fireEvent(new CloseEvent(this)));
 
-            return new HorizontalLayout(save, cancel);
+            HorizontalLayout layout = new HorizontalLayout(save, delete, cancel);
+            layout.setAlignItems(FlexComponent.Alignment.CENTER);
+            layout.setSizeFull();
+            return layout;
         }
 
         public String getConditionRadioButtonValue()

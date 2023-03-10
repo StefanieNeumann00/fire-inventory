@@ -1,12 +1,8 @@
 package de.dhbw.plugins.rest;
 
-import de.dhbw.fireinventory.adapter.equipment.EquipmentResource;
-import de.dhbw.fireinventory.adapter.equipment.EquipmentToEquipmentResourceMapper;
 import de.dhbw.fireinventory.adapter.location.LocationResource;
 import de.dhbw.fireinventory.adapter.location.LocationToLocationResourceMapper;
-import de.dhbw.fireinventory.application.equipment.EquipmentApplicationService;
 import de.dhbw.fireinventory.application.location.LocationApplicationService;
-import de.dhbw.fireinventory.domain.equipment.Equipment;
 import de.dhbw.fireinventory.domain.location.Location;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;

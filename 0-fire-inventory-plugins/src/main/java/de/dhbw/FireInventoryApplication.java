@@ -1,17 +1,17 @@
 package de.dhbw;
 
-import com.vaadin.flow.component.dependency.NpmPackage;
 import java.util.TimeZone;
 
+import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.server.PWA;
+import com.vaadin.flow.theme.Theme;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@PWA(name = "fire-inventory", shortName = "")
-@SpringBootApplication
-@NpmPackage(value = "lumo-css-framework", version = "^4.0.10")
-@NpmPackage(value = "line-awesome", version = "1.3.0")
-public class FireInventoryApplication {
+@PWA(name = "fire-inventory", shortName = "fireIn")
+@SpringBootApplication()
+@Theme(value = "fire-theme")
+public class FireInventoryApplication implements AppShellConfigurator{
 
     public static void main(String[] args) {
         System.setProperty("user.timezone", "UTC");

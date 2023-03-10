@@ -17,8 +17,8 @@ public class EquipmentApplicationService {
         this.equipmentRepository = equipmentRepository;
     }
 
-    public List<Equipment> findAllEquipments() {
-        return this.equipmentRepository.findAllEquipments();
+    public List<Equipment> findAllEquipments(String filterText) {
+        return this.equipmentRepository.findAllBy(filterText);
     }
 
     public void saveEquipment(Equipment equipment) {

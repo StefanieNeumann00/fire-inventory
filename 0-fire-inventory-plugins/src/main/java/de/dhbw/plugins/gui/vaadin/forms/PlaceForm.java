@@ -11,7 +11,6 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import de.dhbw.fireinventory.application.place.PlaceApplicationService;
 import de.dhbw.fireinventory.domain.place.Place;
-import de.dhbw.plugins.rest.PlaceController;
 
 public class PlaceForm extends Dialog implements FormDialog {
     PlaceApplicationService service;
