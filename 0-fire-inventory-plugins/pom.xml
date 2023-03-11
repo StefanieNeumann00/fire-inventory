@@ -16,7 +16,7 @@
     <properties>
         <db.properties>src/main/resources/application.properties</db.properties>
         <java.version>17</java.version>
-        <vaadin.version>24.0.0</vaadin.version>
+        <vaadin.version>23.3.0</vaadin.version>
         <selenium.version>4.8.1</selenium.version>
     </properties>
 
@@ -85,7 +85,7 @@
             <plugin>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
-                <version>9.15.1</version>
+                <version>9.15.2</version>
                 <configuration>
                     <url>${spring.datasource.url}</url>
                     <user>${spring.datasource.username}</user>
