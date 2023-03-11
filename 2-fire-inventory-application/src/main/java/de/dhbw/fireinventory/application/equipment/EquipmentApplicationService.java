@@ -3,6 +3,7 @@ package de.dhbw.fireinventory.application.equipment;
 import de.dhbw.fireinventory.domain.equipment.Equipment;
 import de.dhbw.fireinventory.domain.equipment.EquipmentRepository;
 import de.dhbw.fireinventory.domain.location.Location;
+import de.dhbw.fireinventory.domain.status.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,4 +30,8 @@ public class EquipmentApplicationService {
     {
         this.equipmentRepository.delete(equipment);
     }
+
+    public int getEquipmentCount(){ return this.findAllEquipments(null).size();}
+
+    public int equipmentStatusCount(String status) { return this.equipmentRepository.equipmentStatusCount(status);}
 }

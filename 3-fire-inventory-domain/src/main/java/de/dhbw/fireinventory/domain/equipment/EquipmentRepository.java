@@ -1,5 +1,7 @@
 package de.dhbw.fireinventory.domain.equipment;
 
+import de.dhbw.fireinventory.domain.status.Status;
+
 import java.util.List;
 
 public interface EquipmentRepository {
@@ -9,4 +11,6 @@ public interface EquipmentRepository {
     Equipment save(Equipment equipment);
 
     void delete(Equipment equipment);
+
+    int equipmentStatusCount(String status);
 }
