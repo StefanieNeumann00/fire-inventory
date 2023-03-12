@@ -6,9 +6,16 @@ import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
+import com.vaadin.flow.component.radiobutton.RadioGroupVariant;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
@@ -19,9 +26,10 @@ import de.dhbw.fireinventory.domain.location.Location;
 
 import java.util.List;
 
-public class EquipmentForm extends FormLayout implements FormDialog {
+public class EquipmentForm extends FormLayout {
         TextField designationTextField = new TextField("Designation");
         ComboBox<Location> locationComboBox = new ComboBox<>("Location");
+        RadioButtonGroup<String> conditionRadioGroup = new RadioButtonGroup<>();
         Button save = new Button("Save");
         Button delete = new Button("delete");
         Button cancel = new Button("Cancel");
@@ -29,7 +37,6 @@ public class EquipmentForm extends FormLayout implements FormDialog {
         private Equipment equipment = new Equipment();
 
         public EquipmentForm(List<Location> locations) {
-
             locationComboBox.setItems(locations);
             locationComboBox.setItemLabelGenerator(Location::getDesignation);
             createConditionRadioButton();
@@ -38,6 +45,14 @@ public class EquipmentForm extends FormLayout implements FormDialog {
             binder.bind(designationTextField, "designation");
             binder.bind(locationComboBox, "location");
             binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
+        }
+
+        private void createConditionRadioButton()
+        {
+            conditionRadioGroup.addThemeVariants(RadioGroupVariant.LUMO_VERTICAL);
+            conditionRadioGroup.setLabel("Zustand");
+            conditionRadioGroup.setItems("funktionsfähig", "nicht funktionsfähig");
+            conditionRadioGroup.setValue("funktionsfähig");
         }
 
         public void setEquipment(Equipment equipment) {
@@ -60,6 +75,7 @@ public class EquipmentForm extends FormLayout implements FormDialog {
             HorizontalLayout layout = new HorizontalLayout(save, delete, cancel);
             layout.setAlignItems(FlexComponent.Alignment.CENTER);
             layout.setSizeFull();
+            layout.setSpacing(true);
             return layout;
         }
 

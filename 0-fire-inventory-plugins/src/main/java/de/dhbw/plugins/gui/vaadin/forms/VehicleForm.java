@@ -1,5 +1,7 @@
 package de.dhbw.plugins.gui.vaadin.forms;
 
+import com.vaadin.flow.component.ComponentEvent;
+import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -12,8 +14,10 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
+import com.vaadin.flow.shared.Registration;
 import de.dhbw.fireinventory.application.status.StatusApplicationService;
 import de.dhbw.fireinventory.application.vehicle.VehicleApplicationService;
+import de.dhbw.fireinventory.domain.equipment.Equipment;
 import de.dhbw.fireinventory.domain.place.Place;
 import de.dhbw.fireinventory.domain.status.Status;
 import de.dhbw.fireinventory.domain.vehicle.Vehicle;
@@ -21,8 +25,6 @@ import de.dhbw.fireinventory.domain.vehicle.Vehicle;
 import java.util.List;
 
 public class VehicleForm extends Dialog implements FormDialog {
-    VehicleApplicationService vehicleService;
-    StatusApplicationService statusService;
     TextField designationTextField = new TextField("Designation");
     ComboBox<Place> placeComboBox = new ComboBox<>("Place");
     Button save = new Button("Save");
@@ -30,9 +32,7 @@ public class VehicleForm extends Dialog implements FormDialog {
     Binder<Vehicle> binder = new BeanValidationBinder<>(Vehicle.class);
     private Vehicle vehicle = new Vehicle();
 
-    public VehicleForm(List<Place> places, StatusApplicationService statusService, VehicleApplicationService vehicleService) {
-        this.vehicleService = vehicleService;
-        this.statusService = statusService;
+    public VehicleForm(List<Place> places) {
         this.setResizable(true);
         this.setDraggable(true);
 
@@ -73,52 +73,60 @@ public class VehicleForm extends Dialog implements FormDialog {
         return new HorizontalLayout(save, close);
     }
 
-    private void setVehicleStatus()
-    {
-        String conditionValue = conditionRadioGroup.getValue();
-        Place place = vehicle.getPlace();
-        Status status = statusService.getStatusByDesignation("Einsatzbereit");
-        String placeDesignation = "";
-
-        if(place != null) {
-            placeDesignation = place.getDesignation();
-        }
-
-        if(conditionValue == "funktionsfähig")
-        {
-            if(placeDesignation == "Abwesend")
-            {
-                status = statusService.getStatusByDesignation("Nicht vor Ort");
-            }
-        }
-        else
-        {
-            if(placeDesignation == "Abwesend")
-            {
-                status = statusService.getStatusByDesignation("In Reparatur");
-            }
-            else
-            {
-                status = statusService.getStatusByDesignation("Kaputt");
-            }
-        }
-
-        vehicle.setStatus(status);
-    }
-
     public void validateAndSave() {
         try {
             binder.writeBean(vehicle);
-            setVehicleStatus();
-            vehicleService.saveVehicle(vehicle);
+            fireEvent(new SaveEvent(this, vehicle));
             this.close();
         } catch (ValidationException e) {
             e.printStackTrace();
         }
     }
 
+    public String getConditionRadioButtonValue()
+    {
+        return conditionRadioGroup.getValue();
+    }
+
     public void closeDialog()
     {
         this.close();
+    }
+
+    public static abstract class VehicleFormEvent extends ComponentEvent<VehicleForm> {
+        private Vehicle vehicle;
+
+        protected VehicleFormEvent(VehicleForm source, Vehicle vehicle) {
+            super(source, false);
+            this.vehicle = vehicle;
+        }
+
+        public Vehicle getVehicle() {
+            return vehicle;
+        }
+    }
+
+    public static class SaveEvent extends VehicleForm.VehicleFormEvent {
+        SaveEvent(VehicleForm source, Vehicle vehicle) {
+            super(source, vehicle);
+        }
+    }
+
+    public static class DeleteEvent extends VehicleForm.VehicleFormEvent {
+        DeleteEvent(VehicleForm source, Vehicle vehicle) {
+            super(source, vehicle);
+        }
+
+    }
+
+    public static class CloseEvent extends VehicleForm.VehicleFormEvent {
+        CloseEvent(VehicleForm source) {
+            super(source, null);
+        }
+    }
+
+    public <T extends ComponentEvent<?>> Registration addListener(Class<T> eventType,
+                                                                  ComponentEventListener<T> listener) {
+        return getEventBus().addListener(eventType, listener);
     }
 }

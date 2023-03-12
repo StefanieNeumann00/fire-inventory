@@ -2,8 +2,10 @@ html, :host {
     --lumo-primary-text-color: hsl(357, 96%, 60%);
     --lumo-primary-color: hsl(353, 100%, 45%);
     --lumo-primary-color-50pct: hsla(353, 100%, 45%, 0.5);
+    --lumo-primary-color-30pct: hsla(353, 100%, 45%, 0.3);
     --lumo-primary-color-10pct: hsla(353, 100%, 45%, 0.1);
     --lumo-border-radius-m: 0.5em;
+    --lumo-base-color: #e5e5e5;
 }
 
 a[highlight] {
@@ -15,4 +17,32 @@ a[highlight] {
     .overview.editing .equipment-grid {
         display: none;
     }
+}
+
+.full-height-layout {
+    height: 100%;
+}
+
+.rounded-border {
+    border-radius: 25px;
+    background: #ebebeb;
+}
+
+span {
+    width: 100%;
+    text-align: center;
+}
+
+.no-padding {
+    padding: 0px;
+}
+
+.warning {
+    background-color: var(--lumo-primary-color-30pct);
+}
+
+p {
+    font-size: var(--lumo-font-size-l);
+    line-height: var(--lumo-line-height-m);
+    padding-left: 25px;
 }

@@ -2,8 +2,6 @@ package de.dhbw.fireinventory.application.equipment;
 
 import de.dhbw.fireinventory.domain.equipment.Equipment;
 import de.dhbw.fireinventory.domain.equipment.EquipmentRepository;
-import de.dhbw.fireinventory.domain.location.Location;
-import de.dhbw.fireinventory.domain.status.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +11,7 @@ import java.util.List;
 public class EquipmentApplicationService {
 
     private final EquipmentRepository equipmentRepository;
+
     @Autowired
     public EquipmentApplicationService(final EquipmentRepository equipmentRepository) {
         this.equipmentRepository = equipmentRepository;

@@ -30,4 +30,8 @@ public class VehicleApplicationService {
         location.setVehicle(vehicle);
         this.locationRepository.save(location);
     }
+
+    public int getVehicleCount(){ return this.findAllVehicles().size();}
+
+    public int vehicleStatusCount(String status) { return this.vehicleRepository.vehicleStatusCount(status);}
 }

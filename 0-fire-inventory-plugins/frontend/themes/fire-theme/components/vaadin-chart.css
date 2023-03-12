@@ -5,3 +5,13 @@
     --vaadin-charts-color-3: #949494;
     --vaadin-charts-color-4: #e3001a;
 }
+
+:where([styled-mode]) .highcharts-background {
+    fill:#ebebeb;
+}
+
+#chart {
+    border-radius: 25px;
+    background: #ebebeb;
+}
+

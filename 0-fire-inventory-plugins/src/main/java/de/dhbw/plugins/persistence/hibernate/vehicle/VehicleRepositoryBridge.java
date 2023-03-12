@@ -26,4 +26,6 @@ public class VehicleRepositoryBridge implements VehicleRepository {
     public Vehicle save(final Vehicle vehicle) {
         return this.springDataVehicleRepository.save(vehicle);
     }
+
+    public int vehicleStatusCount(final String status) { return this.springDataVehicleRepository.vehicleStatusCount(status);}
 }

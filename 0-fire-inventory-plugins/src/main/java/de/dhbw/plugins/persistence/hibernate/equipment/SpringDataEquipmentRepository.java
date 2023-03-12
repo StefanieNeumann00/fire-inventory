@@ -16,6 +16,6 @@ public interface SpringDataEquipmentRepository extends JpaRepository<Equipment, 
     List<Equipment> findAllBy(@Param("filterText") String filterText);
 
     @Query("select count(e) from Equipment e where e.status = (select s from Status s where s.designation = :statusDesignation)")
-    int equipmentStatusCount(String statusDesignation);
+    int equipmentStatusCount(@Param("statusDesignation") String statusDesignation);
 
 }
