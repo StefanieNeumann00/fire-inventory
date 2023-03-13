@@ -27,7 +27,9 @@ public class PlaceForm extends Dialog implements FormDialog {
         this.setResizable(true);
         this.setDraggable(true);
 
-        add(designation,createButtonsLayout());
+        this.setHeaderTitle("Add Place");
+
+        this.add(designation,createButtonsLayout());
         binder.bindInstanceFields(this);
         binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
     }

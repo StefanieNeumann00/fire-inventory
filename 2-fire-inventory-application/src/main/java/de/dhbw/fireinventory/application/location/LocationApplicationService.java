@@ -4,9 +4,11 @@ import de.dhbw.fireinventory.domain.location.Location;
 import de.dhbw.fireinventory.domain.location.LocationRepository;
 import de.dhbw.fireinventory.domain.place.Place;
 import de.dhbw.fireinventory.domain.place.PlaceRepository;
+import de.dhbw.fireinventory.domain.vehicle.Vehicle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -23,4 +25,8 @@ public class LocationApplicationService {
     }
 
     public void saveLocation(Location location){ this.locationRepository.save(location); }
+
+    public Location getLocationForVehicle(Vehicle vehicle) { return this.locationRepository.getLocationForVehicle(vehicle); }
+
+    public Location getLocationForPlace(Place place) { return this.locationRepository.getLocationForPlace(place); }
 }

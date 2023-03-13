@@ -8,6 +8,6 @@ CREATE TABLE appointment (
    time_interval   int;
    end_date        Date;
    constraint pk_appointment primary key (id),
-   constraint fk_appointmentvehicle foreign key (vehicle_id) references Vehicle(id),
-   constraint fk_appointmentequipment foreign key (equipment_id) references Equipment(id)
+   constraint fk_appointmentvehicle foreign key (vehicle_id) references vehicle(id),
+   constraint fk_appointmentequipment foreign key (equipment_id) references equipment(id)
 );

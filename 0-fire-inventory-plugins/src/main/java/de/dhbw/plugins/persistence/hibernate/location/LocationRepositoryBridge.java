@@ -2,6 +2,8 @@ package de.dhbw.plugins.persistence.hibernate.location;
 
 import de.dhbw.fireinventory.domain.location.Location;
 import de.dhbw.fireinventory.domain.location.LocationRepository;
+import de.dhbw.fireinventory.domain.place.Place;
+import de.dhbw.fireinventory.domain.vehicle.Vehicle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -25,5 +27,15 @@ public class LocationRepositoryBridge implements LocationRepository {
     @Override
     public Location save(final Location location) {
         return this.springDataLocationRepository.save(location);
+    }
+
+    @Override
+    public Location getLocationForVehicle(Vehicle vehicle) {
+        return this.springDataLocationRepository.getLocationForVehicle(vehicle);
+    }
+
+    @Override
+    public Location getLocationForPlace(Place place) {
+        return this.springDataLocationRepository.getLocationForPlace(place);
     }
 }

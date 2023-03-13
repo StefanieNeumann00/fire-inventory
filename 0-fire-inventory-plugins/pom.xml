@@ -72,14 +72,13 @@
                         <goals>
                             <goal>read-project-properties</goal>
                         </goals>
+                        <configuration>
+                            <files>
+                                <file>${basedir}/src/main/resources/application.properties</file>
+                            </files>
+                        </configuration>
                     </execution>
                 </executions>
-
-                <configuration>
-                    <files>
-                        <file>${basedir}/src/main/resources/application.properties</file>
-                    </files>
-                </configuration>
             </plugin>
 
             <plugin>

@@ -15,11 +15,7 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.shared.Registration;
-import de.dhbw.fireinventory.application.status.StatusApplicationService;
-import de.dhbw.fireinventory.application.vehicle.VehicleApplicationService;
-import de.dhbw.fireinventory.domain.equipment.Equipment;
 import de.dhbw.fireinventory.domain.place.Place;
-import de.dhbw.fireinventory.domain.status.Status;
 import de.dhbw.fireinventory.domain.vehicle.Vehicle;
 
 import java.util.List;
@@ -35,6 +31,8 @@ public class VehicleForm extends Dialog implements FormDialog {
     public VehicleForm(List<Place> places) {
         this.setResizable(true);
         this.setDraggable(true);
+
+        this.setHeaderTitle("Add Vehicle");
 
         placeComboBox.setItems(places);
         placeComboBox.setItemLabelGenerator(Place::getDesignation);

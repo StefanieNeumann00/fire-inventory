@@ -2,6 +2,9 @@ package de.dhbw.fireinventory.application.equipment;
 
 import de.dhbw.fireinventory.domain.equipment.Equipment;
 import de.dhbw.fireinventory.domain.equipment.EquipmentRepository;
+import de.dhbw.fireinventory.domain.location.Location;
+import de.dhbw.fireinventory.domain.status.Status;
+import de.dhbw.fireinventory.domain.vehicle.Vehicle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +22,17 @@ public class EquipmentApplicationService {
 
     public List<Equipment> findAllEquipments(String filterText) {
         return this.equipmentRepository.findAllBy(filterText);
+    }
+
+    public List<Equipment> findAllEquipmentsBy(Location location, Status status, String designation) {
+        if (location == null && status == null) { return this.findAllEquipments(designation); }
+        else if (location != null && status == null && designation.isEmpty()) { return this.equipmentRepository.findAllByLocation(location); }
+        else if (location != null && status == null && !designation.isEmpty()) { return this.equipmentRepository.findAllByLocationAndDesignation(location, designation); }
+        else if (location != null && status != null && designation.isEmpty()) { return this.equipmentRepository.findAllByLocationAndStatus(location, status); }
+        else if (location != null && status != null && !designation.isEmpty()) { return this.equipmentRepository.findAllByLocationStatusAndDesignation(location, status, designation);}
+        else if (location == null && status != null && designation.isEmpty()) { return this.equipmentRepository.findAllByStatus(status); }
+        else { return this.equipmentRepository.findAllByStatusAndDesignation(status, designation);}
+
     }
 
     public void saveEquipment(Equipment equipment) {

@@ -1,14 +1,13 @@
 package de.dhbw.plugins.gui.vaadin.routes;
 
+import ch.qos.logback.core.Layout;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -25,6 +24,7 @@ import de.dhbw.fireinventory.domain.place.Place;
 import de.dhbw.fireinventory.domain.status.Status;
 import de.dhbw.fireinventory.domain.vehicle.Vehicle;
 import de.dhbw.plugins.gui.vaadin.MainLayout;
+import de.dhbw.plugins.gui.vaadin.components.EquipmentGrid;
 import de.dhbw.plugins.gui.vaadin.forms.AppointmentForm;
 import de.dhbw.plugins.gui.vaadin.forms.EquipmentForm;
 import de.dhbw.plugins.gui.vaadin.forms.VehicleForm;
@@ -37,8 +37,9 @@ import java.util.Date;
 @Route(value="", layout = MainLayout.class)
 @PageTitle("Overview | FireInventory")
 public class EquipmentOverview extends VerticalLayout {
-    Grid<Equipment> grid = new Grid<>(Equipment.class, false);
-    TextField filterText = new TextField();
+    EquipmentGrid grid;
+    TextField filterText = new TextField("Bezeichnung");
+    HorizontalLayout filterLayout;
     EquipmentForm equipmentForm;
     PlaceForm placeForm;
     VehicleForm vehicleForm;
@@ -49,7 +50,8 @@ public class EquipmentOverview extends VerticalLayout {
     StatusApplicationService statusService;
     VehicleApplicationService vehicleService;
     AppointmentApplicationService appointmentService;
-    VerticalLayout forms;
+    ComboBox<Location> locationComboBox;
+    ComboBox<Status> statusComboBox;
 
     @Autowired
     public EquipmentOverview(EquipmentApplicationService equipmentService, LocationApplicationService locationService, PlaceApplicationService placeService, StatusApplicationService statusService, VehicleApplicationService vehicleService, AppointmentApplicationService appointmentService)
@@ -70,8 +72,8 @@ public class EquipmentOverview extends VerticalLayout {
         configureAppointmentForm();
 
         add(getToolbar(), getContent());
-        updateList();
         closeEquipmentEditor();
+        closeAppointmentEditor();
     }
 
     private HorizontalLayout getContent() {
@@ -115,41 +117,52 @@ public class EquipmentOverview extends VerticalLayout {
     }
 
     private void configureGrid() {
-        grid.addClassNames("equipment-grid");
-        grid.setSizeFull();
-        grid.getColumns().forEach(col -> col.setAutoWidth(true));
-        grid.addColumn(Equipment::getDesignation).setHeader("Bezeichnung");
-        grid.addColumn(e -> e.getLocation().getDesignation()).setHeader("Ablageort");
-        grid.addColumn(e -> e.getStatus().getDesignation()).setHeader("Status");
-        grid.addColumn(
-                new ComponentRenderer<>(Button::new, (button, equipment) -> {
-                    button.addThemeVariants(ButtonVariant.LUMO_ICON,
-                            ButtonVariant.LUMO_TERTIARY);
-                    button.addClickListener(event -> addAppointment(equipment));
-                    button.setIcon(new Icon(VaadinIcon.CALENDAR));
-                })).setHeader("Manage");
-
-        grid.asSingleSelect().addValueChangeListener(event ->
-                editEquipment(event.getValue()));
+        grid = new EquipmentGrid(equipmentService);
+        grid.addListener(EquipmentGrid.AddAppointmentEvent.class, e -> addAppointment(e.getEquipment()));
+        grid.addListener(EquipmentGrid.EditEquipmentEvent.class, e -> editEquipment(e.getEquipment()));
     }
 
-    private HorizontalLayout getToolbar() {
-        filterText.setPlaceholder("Filter by name...");
+    private VerticalLayout getToolbar() {
+        filterText.setPlaceholder("...");
         filterText.setClearButtonVisible(true);
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
         filterText.addValueChangeListener(e -> updateList());
+
+        Icon filterIcon = new Icon(VaadinIcon.FILTER);
+        filterIcon.addClickListener(e -> changeFilterVisibility());
 
         Button addEquipmentButton = new Button("Add Equipment");
         Button addVehicleButton = new Button("Add Vehicle");
         Button addPlaceButton = new Button("Add Place");
 
+        locationComboBox = new ComboBox<>("Location");
+        locationComboBox.setItems(locationService.findAllLocations());
+        locationComboBox.setItemLabelGenerator(Location::getDesignation);
+        locationComboBox.setClearButtonVisible(true);
+        locationComboBox.addValueChangeListener(e -> updateList());
+
+        statusComboBox = new ComboBox<>("Status");
+        statusComboBox.setItems(statusService.findAllStatuses());
+        statusComboBox.setItemLabelGenerator(Status::getDesignation);
+        statusComboBox.setClearButtonVisible(true);
+        statusComboBox.addValueChangeListener(e -> updateList());
+
         addEquipmentButton.addClickListener(event -> addEquipment());
         addVehicleButton.addClickListener(event -> vehicleForm.open());
         addPlaceButton.addClickListener(event -> placeForm.open());
 
-        HorizontalLayout toolbar = new HorizontalLayout(filterText, addEquipmentButton, addVehicleButton, addPlaceButton);
+        HorizontalLayout buttonsLayout = new HorizontalLayout(filterIcon, addEquipmentButton, addVehicleButton, addPlaceButton);
+        buttonsLayout.setAlignItems(Alignment.CENTER);
+        filterLayout = new HorizontalLayout(locationComboBox, statusComboBox, filterText);
+
+        VerticalLayout toolbar = new VerticalLayout(buttonsLayout, filterLayout);
         toolbar.addClassName("toolbar");
         return toolbar;
+    }
+
+    private void changeFilterVisibility() {
+        if(filterLayout.isVisible()) { filterLayout.setVisible(false); }
+        else { filterLayout.setVisible(true); }
     }
 
     public void editEquipment(Equipment equipment) {
@@ -184,7 +197,7 @@ public class EquipmentOverview extends VerticalLayout {
     }
 
     private void addEquipment() {
-        grid.asSingleSelect().clear();
+        grid.clearGridSelection();
         editEquipment(new Equipment());
     }
 
@@ -196,7 +209,7 @@ public class EquipmentOverview extends VerticalLayout {
     }
 
     private void updateList() {
-        grid.setItems(equipmentService.findAllEquipments(filterText.getValue()));
+        grid.updateList(locationComboBox.getValue(), statusComboBox.getValue(), filterText.getValue());
     }
 
     private void saveEquipment(EquipmentForm.SaveEvent event) {
@@ -219,6 +232,7 @@ public class EquipmentOverview extends VerticalLayout {
     private void savePlace(PlaceForm.SaveEvent event) {
         Place place = event.getPlace();
         placeService.savePlace(place);
+        Location location = locationService.getLocationForPlace(place);
         updateList();
         closePlaceDialog();
     }
@@ -227,6 +241,7 @@ public class EquipmentOverview extends VerticalLayout {
         Vehicle vehicle = event.getVehicle();
         vehicle = setVehicleStatus(vehicle);
         vehicleService.saveVehicle(vehicle);
+        Location location = locationService.getLocationForVehicle(vehicle);
         updateList();
         closeVehicleDialog();
     }
