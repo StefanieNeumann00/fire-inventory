@@ -18,13 +18,20 @@ public class PlaceRepositoryBridge implements PlaceRepository {
     }
 
     @Override
-    public List<Place> findAllPlaces() {
-        return this.springDataPlaceRepository.findAll();
+    public List<Place> findAllBy(String designation) {
+        if(designation == null)
+        {
+            return this.springDataPlaceRepository.findAll();
+        }
+        return this.springDataPlaceRepository.findAllBy(designation);
     }
 
     @Override
     public Place save(final Place place) {
         return this.springDataPlaceRepository.save(place);
     }
+
+    @Override
+    public void delete(Place place) { this.springDataPlaceRepository.delete(place); }
 }
 

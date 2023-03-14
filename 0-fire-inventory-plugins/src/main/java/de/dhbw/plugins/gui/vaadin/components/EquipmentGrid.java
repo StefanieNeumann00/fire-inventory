@@ -8,7 +8,6 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.shared.Registration;
 import de.dhbw.fireinventory.application.equipment.EquipmentApplicationService;
@@ -16,23 +15,17 @@ import de.dhbw.fireinventory.domain.equipment.Equipment;
 import de.dhbw.fireinventory.domain.location.Location;
 import de.dhbw.fireinventory.domain.status.Status;
 
-public class EquipmentGrid extends Grid<Equipment> {
+public class EquipmentGrid extends AbstractGrid<Equipment> {
 
     EquipmentApplicationService equipmentService;
 
     public EquipmentGrid(EquipmentApplicationService equipmentService) {
-        super(Equipment.class, false);
+        super(Equipment.class);
         this.equipmentService = equipmentService;
-        this.setSizeFull();
-        this.setHeightFull();
-        configureGrid();
         updateList(null, null, null);
     }
 
-    private void configureGrid() {
-        this.addClassName("equipment-grid");
-        this.setSizeFull();
-        this.setHeightFull();
+    protected void configureGridColumns() {
         this.getColumns().forEach(col -> col.setAutoWidth(true));
         this.addColumn(Equipment::getDesignation).setHeader("Bezeichnung");
         this.addColumn(e -> e.getLocation().getDesignation()).setHeader("Ablageort");
@@ -50,10 +43,6 @@ public class EquipmentGrid extends Grid<Equipment> {
 
     public void updateList(Location location, Status status, String filterText) {
         this.setItems(equipmentService.findAllEquipmentsBy(location, status, filterText));
-    }
-
-    public void clearGridSelection() {
-        this.asSingleSelect().clear();
     }
 
     public static abstract class EquipmentGridEvent extends ComponentEvent<EquipmentGrid> {

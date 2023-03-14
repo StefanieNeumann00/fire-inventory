@@ -29,7 +29,7 @@ public class VehicleController {
 
     @RequestMapping(method = RequestMethod.GET)
     public List<VehicleResource> getVehicles() {
-        return this.vehicleApplicationService.findAllVehicles().stream()
+        return this.vehicleApplicationService.findAllVehicles(null).stream()
                 .map(vehicleToVehicleResourceMapper)
                 .collect(Collectors.toList());
     }

@@ -6,7 +6,9 @@ import java.util.List;
 
 public interface PlaceRepository {
 
-    List<Place> findAllPlaces();
+    List<Place> findAllBy(String designation);
 
     Place save(Place place);
+
+    void delete(Place place);
 }

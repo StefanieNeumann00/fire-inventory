@@ -14,8 +14,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface SpringDataEquipmentRepository extends JpaRepository<Equipment, UUID> {
 
-    @Query("select e from Equipment e where lower(e.designation) like lower(concat('%', :filterText, '%'))")
-    List<Equipment> findAllBy(@Param("filterText") String filterText);
+    @Query("select e from Equipment e where lower(e.designation) like lower(concat('%', :designation, '%'))")
+    List<Equipment> findAllBy(@Param("designation") String designation);
 
     @Query("select count(e) from Equipment e where e.status = (select s from Status s where s.designation = :statusDesignation)")
     int equipmentStatusCount(@Param("statusDesignation") String statusDesignation);

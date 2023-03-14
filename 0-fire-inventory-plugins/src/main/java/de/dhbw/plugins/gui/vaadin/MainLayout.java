@@ -8,9 +8,8 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.HighlightConditions;
 import com.vaadin.flow.router.RouterLink;
-import com.vaadin.flow.theme.Theme;
 import de.dhbw.plugins.gui.vaadin.routes.Dashboard;
-import de.dhbw.plugins.gui.vaadin.routes.EquipmentOverview;
+import de.dhbw.plugins.gui.vaadin.routes.Inventory;
 
 public class MainLayout extends AppLayout {
 
@@ -37,7 +36,7 @@ public class MainLayout extends AppLayout {
     }
 
     private void createDrawer() {
-        RouterLink listLink = new RouterLink("Overview", EquipmentOverview.class);
+        RouterLink listLink = new RouterLink("Inventory", Inventory.class);
         listLink.setHighlightCondition(HighlightConditions.sameLocation());
 
         addToDrawer(new VerticalLayout(

@@ -20,8 +20,8 @@ public class EquipmentApplicationService {
         this.equipmentRepository = equipmentRepository;
     }
 
-    public List<Equipment> findAllEquipments(String filterText) {
-        return this.equipmentRepository.findAllBy(filterText);
+    public List<Equipment> findAllEquipments(String designation) {
+        return this.equipmentRepository.findAllBy(designation);
     }
 
     public List<Equipment> findAllEquipmentsBy(Location location, Status status, String designation) {

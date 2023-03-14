@@ -22,8 +22,8 @@ public class PlaceApplicationService {
         this.locationRepository = locationRepository;
     }
 
-    public List<Place> findAllPlaces() {
-        return this.placeRepository.findAllPlaces();
+    public List<Place> findAllBy(String designation) {
+        return this.placeRepository.findAllBy(designation);
     }
 
     public void savePlace(Place place){
@@ -31,6 +31,10 @@ public class PlaceApplicationService {
         Location location = new Location();
         location.setPlace(place);
         this.locationRepository.save(location);
+    }
+
+    public void deletePlace(Place place) {
+        this.placeRepository.delete(place);
     }
 }
 

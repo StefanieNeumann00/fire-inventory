@@ -5,18 +5,16 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.shared.Registration;
-import de.dhbw.fireinventory.application.place.PlaceApplicationService;
-import de.dhbw.fireinventory.domain.equipment.Equipment;
 import de.dhbw.fireinventory.domain.place.Place;
 
-public class PlaceForm extends Dialog implements FormDialog {
+public class PlaceForm extends FormLayout {
     TextField designation = new TextField("Designation");
     Button save = new Button("Save");
     Button close = new Button("Cancel");
@@ -24,11 +22,6 @@ public class PlaceForm extends Dialog implements FormDialog {
     private Place place = new Place();
 
     public PlaceForm() {
-        this.setResizable(true);
-        this.setDraggable(true);
-
-        this.setHeaderTitle("Add Place");
-
         this.add(designation,createButtonsLayout());
         binder.bindInstanceFields(this);
         binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
@@ -47,7 +40,7 @@ public class PlaceForm extends Dialog implements FormDialog {
         close.addClickShortcut(Key.ESCAPE);
 
         save.addClickListener(event -> validateAndSave());
-        close.addClickListener(event -> close());
+        close.addClickListener(event -> fireEvent(new CloseEvent(this)));
 
         return new HorizontalLayout(save, close);
     }
@@ -56,7 +49,6 @@ public class PlaceForm extends Dialog implements FormDialog {
         try {
             binder.writeBean(place);
             fireEvent(new PlaceForm.SaveEvent(this, place));
-            this.close();
         } catch (ValidationException e) {
             e.printStackTrace();
         }

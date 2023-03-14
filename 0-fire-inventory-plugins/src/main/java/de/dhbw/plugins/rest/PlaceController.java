@@ -29,7 +29,7 @@ public class PlaceController {
 
     @RequestMapping(method = RequestMethod.GET)
     public List<PlaceResource> getPlaces() {
-        return this.placeApplicationService.findAllPlaces().stream()
+        return this.placeApplicationService.findAllBy(null).stream()
                 .map(placeToPlaceResourceMapper)
                 .collect(Collectors.toList());
     }

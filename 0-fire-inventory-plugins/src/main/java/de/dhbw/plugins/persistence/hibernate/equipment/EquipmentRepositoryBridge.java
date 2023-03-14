@@ -20,12 +20,12 @@ public class EquipmentRepositoryBridge implements EquipmentRepository {
     }
 
     @Override
-    public List<Equipment> findAllBy(final String filterText) {
-        if(filterText == null)
+    public List<Equipment> findAllBy(final String designation) {
+        if(designation == null)
         {
             return this.springDataEquipmentRepository.findAll();
         }
-        return this.springDataEquipmentRepository.findAllBy(filterText);
+        return this.springDataEquipmentRepository.findAllBy(designation);
     }
 
     @Override
