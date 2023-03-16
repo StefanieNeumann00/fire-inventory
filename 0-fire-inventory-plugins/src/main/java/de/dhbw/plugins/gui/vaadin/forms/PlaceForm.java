@@ -17,6 +17,7 @@ import de.dhbw.fireinventory.domain.place.Place;
 public class PlaceForm extends FormLayout {
     TextField designation = new TextField("Designation");
     Button save = new Button("Save");
+    Button delete = new Button("delete");
     Button close = new Button("Cancel");
     Binder<Place> binder = new BeanValidationBinder<>(Place.class);
     private Place place = new Place();
@@ -34,15 +35,17 @@ public class PlaceForm extends FormLayout {
 
     private HorizontalLayout createButtonsLayout() {
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
         close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 
         save.addClickShortcut(Key.ENTER);
         close.addClickShortcut(Key.ESCAPE);
 
         save.addClickListener(event -> validateAndSave());
+        delete.addClickListener(event -> fireEvent(new DeleteEvent(this, place)));
         close.addClickListener(event -> fireEvent(new CloseEvent(this)));
 
-        return new HorizontalLayout(save, close);
+        return new HorizontalLayout(save, delete,  close);
     }
 
     public void validateAndSave() {

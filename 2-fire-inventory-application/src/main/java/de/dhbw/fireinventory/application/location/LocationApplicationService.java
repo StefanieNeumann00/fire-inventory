@@ -29,4 +29,14 @@ public class LocationApplicationService {
     public Location getLocationForVehicle(Vehicle vehicle) { return this.locationRepository.getLocationForVehicle(vehicle); }
 
     public Location getLocationForPlace(Place place) { return this.locationRepository.getLocationForPlace(place); }
+
+    public void deleteLocation(Place place) {
+        Location location = this.getLocationForPlace(place);
+        this.locationRepository.deleteLocation(location);
+    }
+
+    public void deleteLocation(Vehicle vehicle) {
+        Location location = this.getLocationForVehicle(vehicle);
+        this.locationRepository.deleteLocation(location);
+    }
 }

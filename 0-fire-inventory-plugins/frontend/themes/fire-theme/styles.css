@@ -6,6 +6,7 @@ html, :host {
     --lumo-primary-color-10pct: hsla(353, 100%, 45%, 0.1);
     --lumo-border-radius-m: 0.5em;
     --lumo-base-color: #e5e5e5;
+    --calendar-date-selected-color: hsl(296, 98%, 22%, 0.5);
 }
 
 a[highlight] {

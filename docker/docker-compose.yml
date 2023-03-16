@@ -7,6 +7,6 @@ services:
     environment:
       POSTGRES_USER: fire-inventory
       POSTGRES_PASSWORD: fire-inventory
-      POSTGRES_DB: fire-inventory
+      POSTGRES_DB: fire-inventory-database
       TZ: UTC
       PGTZ: UTC

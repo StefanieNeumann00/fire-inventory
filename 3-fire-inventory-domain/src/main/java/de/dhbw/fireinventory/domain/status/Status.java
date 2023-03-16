@@ -4,10 +4,15 @@ import de.dhbw.fireinventory.domain.AbstractEntity;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "status")
 public class Status extends AbstractEntity {
+
+    @NotNull
+    @NotEmpty
     private String designation;
 
     public Status() {

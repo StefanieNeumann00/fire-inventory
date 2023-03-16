@@ -86,6 +86,7 @@ public class Inventory extends VerticalLayout {
 
     private void navigateToDestroyedVehicles() {
         vehiclesTab.setSelected(true);
+        vehicleTabLayout.setStatusComboBox(statusService.getStatusByDesignation("Kaputt"));
     }
 
     private void updateBadge() {

@@ -1,0 +1,7 @@
+.weekend {
+    color: var(--lumo-primary-text-color);
+}
+
+.appointment-set::before {
+    background-color: var(--calendar-date-selected-color);
+}

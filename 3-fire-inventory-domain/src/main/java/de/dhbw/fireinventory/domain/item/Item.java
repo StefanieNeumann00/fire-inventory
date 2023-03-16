@@ -1,7 +1,7 @@
-package de.dhbw.fireinventory.domain.location;
+package de.dhbw.fireinventory.domain.item;
 
 import de.dhbw.fireinventory.domain.AbstractEntity;
-import de.dhbw.fireinventory.domain.place.Place;
+import de.dhbw.fireinventory.domain.equipment.Equipment;
 import de.dhbw.fireinventory.domain.vehicle.Vehicle;
 
 import javax.persistence.Entity;
@@ -10,24 +10,24 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "location")
-public class Location extends AbstractEntity {
+@Table(name = "item")
+public class Item extends AbstractEntity {
 
     @ManyToOne()
-    @JoinColumn(name = "place_id", referencedColumnName = "id", nullable = true)
-    private Place place;
+    @JoinColumn(name = "equipment_id", referencedColumnName = "id", nullable = true)
+    private Equipment equipment;
 
     @ManyToOne()
     @JoinColumn(name = "vehicle_id", referencedColumnName = "id", nullable = true)
     private Vehicle vehicle;
 
 
-    public Place getPlace() {
-        return place;
+    public Equipment getEquipment() {
+        return equipment;
     }
 
-    public void setPlace(Place place) {
-        this.place = place;
+    public void setEquipment(Equipment equipment) {
+        this.equipment = equipment;
     }
 
     public Vehicle getVehicle() {
@@ -40,7 +40,7 @@ public class Location extends AbstractEntity {
 
     public String getDesignation()
     {
-        if(this.getPlace() == null)
+        if(this.getEquipment() == null)
         {
             if(this.getVehicle() == null)
             {
@@ -53,7 +53,7 @@ public class Location extends AbstractEntity {
         }
         else
         {
-            return this.getPlace().getDesignation();
+            return this.getEquipment().getDesignation();
         }
     }
 }

@@ -5,19 +5,15 @@ import de.dhbw.fireinventory.domain.location.Location;
 import de.dhbw.fireinventory.domain.status.Status;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.UUID;
 
 @Entity
 @Table(name = "equipment")
-public class Equipment {
-
-
-    @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
-    private UUID id;
+public class Equipment extends AbstractEntity{
 
     @NotNull
+    @NotEmpty
     private String designation = "";
 
     @ManyToOne
@@ -30,14 +26,6 @@ public class Equipment {
     @JoinColumn(name = "location_id", referencedColumnName = "id")
     private Location location;
 
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
 
     public String getDesignation() {
         return designation;

@@ -38,4 +38,9 @@ public class LocationRepositoryBridge implements LocationRepository {
     public Location getLocationForPlace(Place place) {
         return this.springDataLocationRepository.getLocationForPlace(place);
     }
+
+    @Override
+    public void deleteLocation(Location location) {
+        this.springDataLocationRepository.delete(location);
+    }
 }

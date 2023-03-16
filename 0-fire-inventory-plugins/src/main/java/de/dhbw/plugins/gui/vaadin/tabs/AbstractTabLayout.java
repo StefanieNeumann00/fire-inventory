@@ -4,6 +4,7 @@ import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.shared.Registration;
+import de.dhbw.fireinventory.domain.appointment.Appointment;
 
 public abstract class AbstractTabLayout extends VerticalLayout {
 

@@ -2,6 +2,7 @@
   "name": "no-name",
   "license": "UNLICENSED",
   "dependencies": {
+    "@polymer/iron-a11y-keys-behavior": "3.0.1",
     "@polymer/iron-icon": "3.0.1",
     "@polymer/iron-iconset-svg": "3.0.1",
     "@polymer/iron-list": "3.1.0",
@@ -14,7 +15,6 @@
     "@vaadin/avatar-group": "23.3.0",
     "@vaadin/bundles": "23.3.0",
     "@vaadin/button": "23.3.0",
-    "@vaadin/charts": "23.3.0",
     "@vaadin/checkbox": "23.3.0",
     "@vaadin/checkbox-group": "23.3.0",
     "@vaadin/combo-box": "23.3.0",
@@ -66,7 +66,6 @@
     "@vaadin/vaadin-app-layout": "23.3.0",
     "@vaadin/vaadin-avatar": "23.3.0",
     "@vaadin/vaadin-button": "23.3.0",
-    "@vaadin/vaadin-charts": "23.3.0",
     "@vaadin/vaadin-checkbox": "23.3.0",
     "@vaadin/vaadin-combo-box": "23.3.0",
     "@vaadin/vaadin-confirm-dialog": "23.3.0",
@@ -128,6 +127,7 @@
   },
   "vaadin": {
     "dependencies": {
+      "@polymer/iron-a11y-keys-behavior": "3.0.1",
       "@polymer/iron-icon": "3.0.1",
       "@polymer/iron-iconset-svg": "3.0.1",
       "@polymer/iron-list": "3.1.0",
@@ -140,7 +140,6 @@
       "@vaadin/avatar-group": "23.3.0",
       "@vaadin/bundles": "23.3.0",
       "@vaadin/button": "23.3.0",
-      "@vaadin/charts": "23.3.0",
       "@vaadin/checkbox": "23.3.0",
       "@vaadin/checkbox-group": "23.3.0",
       "@vaadin/combo-box": "23.3.0",
@@ -192,7 +191,6 @@
       "@vaadin/vaadin-app-layout": "23.3.0",
       "@vaadin/vaadin-avatar": "23.3.0",
       "@vaadin/vaadin-button": "23.3.0",
-      "@vaadin/vaadin-charts": "23.3.0",
       "@vaadin/vaadin-checkbox": "23.3.0",
       "@vaadin/vaadin-combo-box": "23.3.0",
       "@vaadin/vaadin-confirm-dialog": "23.3.0",
@@ -252,7 +250,7 @@
       "workbox-core": "6.5.0",
       "workbox-precaching": "6.5.0"
     },
-    "hash": "84deb6aaafccc99c9acb604008ba089221d55e37299be3c036bc99d48ee4874b"
+    "hash": "b97c49e2590aa2b6134f81872ed8c578d4b81bd65f46cc8f2b8059ad7eceb5a2"
   },
   "overrides": {
     "@vaadin/bundles": "$@vaadin/bundles",
@@ -360,7 +358,6 @@
     "@vaadin/vaadin-time-picker": "$@vaadin/vaadin-time-picker",
     "@vaadin/vaadin-upload": "$@vaadin/vaadin-upload",
     "@vaadin/vaadin-virtual-list": "$@vaadin/vaadin-virtual-list",
-    "@vaadin/vaadin-charts": "$@vaadin/vaadin-charts",
-    "@vaadin/charts": "$@vaadin/charts"
+    "@polymer/iron-a11y-keys-behavior": "$@polymer/iron-a11y-keys-behavior"
   }
 }

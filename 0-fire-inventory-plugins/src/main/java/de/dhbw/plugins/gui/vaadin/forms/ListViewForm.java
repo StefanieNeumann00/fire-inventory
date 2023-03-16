@@ -1,0 +1,60 @@
+package de.dhbw.plugins.gui.vaadin.forms;
+
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Text;
+import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.virtuallist.VirtualList;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.dom.ElementFactory;
+import de.dhbw.fireinventory.domain.appointment.Appointment;
+import de.dhbw.fireinventory.domain.item.Item;
+
+import java.util.List;
+
+public class ListViewForm extends FormLayout {
+
+    VirtualList<Appointment> list;
+
+    public ListViewForm(List<Appointment> appointments) {
+        list = new VirtualList<>();
+        setAppointments(appointments);
+        add(list);
+    }
+
+    public void setAppointments(List<Appointment> appointments) {
+        if (appointments != null) {
+            list.setItems(appointments);
+            list.setRenderer(ListRenderer);
+        }
+    }
+
+    private ComponentRenderer<Component, Appointment> ListRenderer = new ComponentRenderer<>(
+            appointment -> {
+                HorizontalLayout cardLayout = new HorizontalLayout();
+                cardLayout.setMargin(true);
+
+                Icon icon = getIcon(appointment.getItem());
+
+                VerticalLayout infoLayout = new VerticalLayout();
+                infoLayout.setSpacing(false);
+                infoLayout.setPadding(false);
+                infoLayout.getElement().appendChild(
+                        ElementFactory.createStrong(appointment.getDesignation()));
+                infoLayout.add(new Div(new Text(appointment.getItem().getDesignation())));
+                cardLayout.add(icon, infoLayout);
+                return cardLayout;
+            });
+
+    private Icon getIcon(Item item) {
+        if (item.getVehicle() != null) {
+            return new Icon(VaadinIcon.TRUCK);
+        } else {
+            return new Icon(VaadinIcon.HAMMER);
+        }
+    }
+}

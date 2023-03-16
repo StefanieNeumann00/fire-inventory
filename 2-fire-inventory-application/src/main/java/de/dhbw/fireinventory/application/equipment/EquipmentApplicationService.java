@@ -2,6 +2,8 @@ package de.dhbw.fireinventory.application.equipment;
 
 import de.dhbw.fireinventory.domain.equipment.Equipment;
 import de.dhbw.fireinventory.domain.equipment.EquipmentRepository;
+import de.dhbw.fireinventory.domain.item.Item;
+import de.dhbw.fireinventory.domain.item.ItemRepository;
 import de.dhbw.fireinventory.domain.location.Location;
 import de.dhbw.fireinventory.domain.status.Status;
 import de.dhbw.fireinventory.domain.vehicle.Vehicle;
@@ -14,10 +16,12 @@ import java.util.List;
 public class EquipmentApplicationService {
 
     private final EquipmentRepository equipmentRepository;
+    private final ItemRepository itemRepository;
 
     @Autowired
-    public EquipmentApplicationService(final EquipmentRepository equipmentRepository) {
+    public EquipmentApplicationService(final EquipmentRepository equipmentRepository, ItemRepository itemRepository) {
         this.equipmentRepository = equipmentRepository;
+        this.itemRepository = itemRepository;
     }
 
     public List<Equipment> findAllEquipments(String designation) {
@@ -37,6 +41,10 @@ public class EquipmentApplicationService {
 
     public void saveEquipment(Equipment equipment) {
         this.equipmentRepository.save(equipment);
+
+        Item item = new Item();
+        item.setEquipment(equipment);
+        this.itemRepository.save(item);
     }
 
     public void deleteEquipment(Equipment equipment)

@@ -11,8 +11,10 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import de.dhbw.fireinventory.application.location.LocationApplicationService;
 import de.dhbw.fireinventory.application.place.PlaceApplicationService;
 import de.dhbw.fireinventory.domain.place.Place;
+import de.dhbw.plugins.gui.vaadin.components.ErrorMessage;
 import de.dhbw.plugins.gui.vaadin.components.PlaceGrid;
 import de.dhbw.plugins.gui.vaadin.forms.PlaceForm;
+import org.springframework.dao.DataIntegrityViolationException;
 
 public class PlaceTabLayout extends AbstractTabLayout{
 
@@ -39,6 +41,7 @@ public class PlaceTabLayout extends AbstractTabLayout{
 
     private void configurePlaceForm() {
         placeForm = new PlaceForm();
+        placeForm.setWidth("25em");
         placeForm.addListener(PlaceForm.SaveEvent.class, this::savePlace);
         placeForm.addListener(PlaceForm.DeleteEvent.class, this::deletePlace);
         placeForm.addListener(PlaceForm.CloseEvent.class, e -> closePlaceEditor());
@@ -95,9 +98,16 @@ public class PlaceTabLayout extends AbstractTabLayout{
     }
 
     private void deletePlace(PlaceForm.DeleteEvent event) {
-        placeService.deletePlace(event.getPlace());
-        updateList();
-        closePlaceEditor();
+        try {
+            locationService.deleteLocation(event.getPlace());
+            placeService.deletePlace(event.getPlace());
+            updateList();
+            closePlaceEditor();
+        }
+        catch (DataIntegrityViolationException exception) {
+            new ErrorMessage("You cannot delete this place since there are still equipments attached.");
+        }
+
     }
 
     private VerticalLayout getToolbar() {

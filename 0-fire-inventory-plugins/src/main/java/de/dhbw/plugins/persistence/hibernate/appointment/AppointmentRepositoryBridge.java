@@ -2,6 +2,7 @@ package de.dhbw.plugins.persistence.hibernate.appointment;
 
 import de.dhbw.fireinventory.domain.appointment.Appointment;
 import de.dhbw.fireinventory.domain.appointment.AppointmentRepository;
+import de.dhbw.fireinventory.domain.item.Item;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -30,5 +31,20 @@ public class AppointmentRepositoryBridge implements AppointmentRepository {
     @Override
     public void delete(Appointment appointment) {
         this.springDataAppointmentRepository.delete(appointment);
+    }
+
+    @Override
+    public List<Appointment> findAppointmentsFor(Item item) {
+        return this.springDataAppointmentRepository.findFor(item);
+    }
+
+    @Override
+    public List<Appointment> findAppointmentsFor(String designation) {
+        return this.springDataAppointmentRepository.findFor(designation);
+    }
+
+    @Override
+    public List<Appointment> findAppointmentsFor(Item item, String designation) {
+        return this.springDataAppointmentRepository.findFor(item, designation);
     }
 }

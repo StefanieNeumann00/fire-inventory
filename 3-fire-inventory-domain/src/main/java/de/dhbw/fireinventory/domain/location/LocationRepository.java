@@ -14,4 +14,6 @@ public interface LocationRepository {
     Location getLocationForVehicle(Vehicle vehicle);
 
     Location getLocationForPlace(Place place);
+
+    void deleteLocation(Location location);
 }

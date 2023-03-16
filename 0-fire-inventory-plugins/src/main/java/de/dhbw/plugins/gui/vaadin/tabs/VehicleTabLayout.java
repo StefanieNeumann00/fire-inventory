@@ -14,15 +14,13 @@ import de.dhbw.fireinventory.application.location.LocationApplicationService;
 import de.dhbw.fireinventory.application.place.PlaceApplicationService;
 import de.dhbw.fireinventory.application.status.StatusApplicationService;
 import de.dhbw.fireinventory.application.vehicle.VehicleApplicationService;
-import de.dhbw.fireinventory.domain.appointment.Appointment;
 import de.dhbw.fireinventory.domain.place.Place;
 import de.dhbw.fireinventory.domain.status.Status;
 import de.dhbw.fireinventory.domain.vehicle.Vehicle;
+import de.dhbw.plugins.gui.vaadin.components.ErrorMessage;
 import de.dhbw.plugins.gui.vaadin.components.VehicleGrid;
 import de.dhbw.plugins.gui.vaadin.forms.*;
-
-import java.time.ZoneId;
-import java.util.Date;
+import org.springframework.dao.DataIntegrityViolationException;
 
 public class VehicleTabLayout extends AbstractTabLayout{
 
@@ -30,7 +28,6 @@ public class VehicleTabLayout extends AbstractTabLayout{
     TextField filterText = new TextField("Bezeichnung");
     HorizontalLayout filterLayout;
     VehicleForm vehicleForm;
-    VehicleAppointmentForm appointmentForm;
     LocationApplicationService locationService;
     PlaceApplicationService placeService;
     StatusApplicationService statusService;
@@ -51,19 +48,16 @@ public class VehicleTabLayout extends AbstractTabLayout{
 
         configureGrid();
         configureVehicleForm();
-        configureAppointmentForm();
 
         add(getToolbar(), getContent());
         closeVehicleEditor();
-        closeAppointmentEditor();
     }
 
     private HorizontalLayout getContent() {
-        HorizontalLayout content = new HorizontalLayout(grid, vehicleForm, appointmentForm);
+        HorizontalLayout content = new HorizontalLayout(grid, vehicleForm);
 
         content.setFlexGrow(2, grid);
         content.setFlexGrow(1, vehicleForm);
-        content.setFlexGrow(1,appointmentForm);
 
         content.addClassNames("content");
         content.setSizeFull();
@@ -72,23 +66,18 @@ public class VehicleTabLayout extends AbstractTabLayout{
         return content;
     }
 
-    private void configureAppointmentForm() {
-        appointmentForm = new VehicleAppointmentForm(vehicleService.findAllVehicles(null));
-        appointmentForm.setWidth("25em");
-        appointmentForm.addListener(AppointmentForm.SaveEvent.class, this::saveAppointment);
-        appointmentForm.addListener(AppointmentForm.CloseEvent.class, e -> closeAppointmentEditor());
-    }
-
     private void configureVehicleForm() {
         vehicleForm = new VehicleForm(placeService.findAllBy(null));
+        vehicleForm.setWidth("25em");
         vehicleForm.addListener(VehicleForm.SaveEvent.class, this::saveVehicle);
+        vehicleForm.addListener(VehicleForm.DeleteEvent.class, this::deleteVehicle);
         vehicleForm.addListener(VehicleForm.CloseEvent.class, e -> closeVehicleEditor());
     }
 
     protected void configureGrid() {
         grid = new VehicleGrid(vehicleService);
         grid.addListener(VehicleGrid.AddAppointmentEvent.class, e -> addAppointment(e.getVehicle()));
-        grid.addListener(VehicleGrid.EditVehicleEvent.class, e -> editEquipment(e.getVehicle()));
+        grid.addListener(VehicleGrid.EditVehicleEvent.class, e -> editVehicle(e.getVehicle()));
     }
 
     private VerticalLayout getToolbar() {
@@ -126,6 +115,8 @@ public class VehicleTabLayout extends AbstractTabLayout{
         return toolbar;
     }
 
+    private void addAppointment(Vehicle vehicle) {}
+
     private void changeFilterVisibility() {
         if(filterLayout.isVisible()) { filterLayout.setVisible(false); }
         else { filterLayout.setVisible(true); }
@@ -133,8 +124,21 @@ public class VehicleTabLayout extends AbstractTabLayout{
 
     public void setStatusComboBox(Status status) { statusComboBox.setValue(status); }
 
-    public void editEquipment(Vehicle vehicle) {
-        closeAppointmentEditor();
+    private void deleteVehicle(VehicleForm.DeleteEvent event) {
+        try {
+            locationService.deleteLocation(event.getVehicle());
+            vehicleService.deleteVehicle(event.getVehicle());
+            updateList();
+            closeVehicleEditor();
+            fireEvent(new GridUpdatedEvent(this));
+        }
+        catch (DataIntegrityViolationException exception) {
+            new ErrorMessage("You cannot delete this vehicle since there are still equipments attached.");
+        }
+
+    }
+
+    public void editVehicle(Vehicle vehicle) {
         if (vehicle == null) {
             closeVehicleEditor();
         } else {
@@ -150,31 +154,9 @@ public class VehicleTabLayout extends AbstractTabLayout{
         removeClassName("editing");
     }
 
-    private void closeAppointmentEditor() {
-        appointmentForm.setVehicle(null);
-        appointmentForm.setVisible(false);
-        removeClassName("editing");
-    }
-
     private void addVehicle() {
         grid.clearGridSelection();
-        editEquipment(new Vehicle());
-    }
-
-    private void addAppointment(Vehicle vehicle) {
-        closeVehicleEditor();
-        appointmentForm.setVehicle(vehicle);
-        appointmentForm.setVisible(true);
-        addClassName("editing");
-    }
-
-    private void saveAppointment(AppointmentForm.SaveEvent event) {
-        Appointment appointment = event.getAppointment();
-        Date date = Date.from(appointmentForm.getDueDate().atStartOfDay(ZoneId.systemDefault()).toInstant());
-        appointment.setDueDate(date);
-        appointmentService.saveAppointment(appointment);
-        updateList();
-        closeAppointmentEditor();
+        editVehicle(new Vehicle());
     }
 
     private void updateList() {

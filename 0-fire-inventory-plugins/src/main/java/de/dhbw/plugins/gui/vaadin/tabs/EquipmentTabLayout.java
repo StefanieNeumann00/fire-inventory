@@ -15,19 +15,13 @@ import com.vaadin.flow.shared.Registration;
 import de.dhbw.fireinventory.application.appointment.AppointmentApplicationService;
 import de.dhbw.fireinventory.application.equipment.EquipmentApplicationService;
 import de.dhbw.fireinventory.application.location.LocationApplicationService;
-import de.dhbw.fireinventory.application.place.PlaceApplicationService;
 import de.dhbw.fireinventory.application.status.StatusApplicationService;
-import de.dhbw.fireinventory.application.vehicle.VehicleApplicationService;
 import de.dhbw.fireinventory.domain.appointment.Appointment;
 import de.dhbw.fireinventory.domain.equipment.Equipment;
 import de.dhbw.fireinventory.domain.location.Location;
-import de.dhbw.fireinventory.domain.place.Place;
 import de.dhbw.fireinventory.domain.status.Status;
-import de.dhbw.fireinventory.domain.vehicle.Vehicle;
-import de.dhbw.plugins.gui.vaadin.MainLayout;
 import de.dhbw.plugins.gui.vaadin.components.EquipmentGrid;
 import de.dhbw.plugins.gui.vaadin.forms.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.ZoneId;
 import java.util.Date;
@@ -37,7 +31,6 @@ public class EquipmentTabLayout extends AbstractTabLayout {
     TextField filterText = new TextField("Bezeichnung");
     HorizontalLayout filterLayout;
     EquipmentForm equipmentForm;
-    EquipmentAppointmentForm appointmentForm;
     EquipmentApplicationService equipmentService;
     LocationApplicationService locationService;
     StatusApplicationService statusService;
@@ -56,19 +49,16 @@ public class EquipmentTabLayout extends AbstractTabLayout {
 
         configureGrid();
         configureEquipmentForm();
-        configureAppointmentForm();
 
         add(getToolbar(), getContent());
         closeEquipmentEditor();
-        closeAppointmentEditor();
     }
 
     private HorizontalLayout getContent() {
-        HorizontalLayout content = new HorizontalLayout(grid, equipmentForm, appointmentForm);
+        HorizontalLayout content = new HorizontalLayout(grid, equipmentForm);
 
         content.setFlexGrow(2, grid);
         content.setFlexGrow(1, equipmentForm);
-        content.setFlexGrow(1,appointmentForm);
 
         content.addClassNames("content");
         content.setSizeFull();
@@ -85,17 +75,16 @@ public class EquipmentTabLayout extends AbstractTabLayout {
         equipmentForm.addListener(EquipmentForm.CloseEvent.class, e -> closeEquipmentEditor());
     }
 
-    private void configureAppointmentForm() {
-        appointmentForm = new EquipmentAppointmentForm(equipmentService.findAllEquipments(null));
-        appointmentForm.setWidth("25em");
-        appointmentForm.addListener(AppointmentForm.SaveEvent.class, this::saveAppointment);
-        appointmentForm.addListener(AppointmentForm.CloseEvent.class, e -> closeAppointmentEditor());
-    }
-
     protected void configureGrid() {
         grid = new EquipmentGrid(equipmentService);
         grid.addListener(EquipmentGrid.AddAppointmentEvent.class, e -> addAppointment(e.getEquipment()));
         grid.addListener(EquipmentGrid.EditEquipmentEvent.class, e -> editEquipment(e.getEquipment()));
+    }
+
+    private void addAppointment(Equipment equipment) {}
+
+    private void deleteAppointment(AppointmentForm.DeleteEvent event) {
+        appointmentService.deleteAppointment(event.getAppointment());
     }
 
     private VerticalLayout getToolbar() {
@@ -141,7 +130,6 @@ public class EquipmentTabLayout extends AbstractTabLayout {
     public void setStatusComboBox(Status status) { statusComboBox.setValue(status); }
 
     public void editEquipment(Equipment equipment) {
-        closeAppointmentEditor();
         if (equipment == null) {
             closeEquipmentEditor();
         } else {
@@ -157,22 +145,9 @@ public class EquipmentTabLayout extends AbstractTabLayout {
         removeClassName("editing");
     }
 
-    private void closeAppointmentEditor() {
-        appointmentForm.setEquipment(null);
-        appointmentForm.setVisible(false);
-        removeClassName("editing");
-    }
-
     private void addEquipment() {
         grid.clearGridSelection();
         editEquipment(new Equipment());
-    }
-
-    private void addAppointment(Equipment equipment) {
-        closeEquipmentEditor();
-        appointmentForm.setEquipment(equipment);
-        appointmentForm.setVisible(true);
-        addClassName("editing");
     }
 
     private void updateList() {
@@ -188,19 +163,11 @@ public class EquipmentTabLayout extends AbstractTabLayout {
         fireEvent(new GridUpdatedEvent(this));
     }
 
-    private void saveAppointment(AppointmentForm.SaveEvent event) {
-        Appointment appointment = event.getAppointment();
-        Date date = Date.from(appointmentForm.getDueDate().atStartOfDay(ZoneId.systemDefault()).toInstant());
-        appointment.setDueDate(date);
-        appointmentService.saveAppointment(appointment);
-        updateList();
-        closeAppointmentEditor();
-    }
-
     private void deleteEquipment(EquipmentForm.DeleteEvent event) {
         equipmentService.deleteEquipment(event.getEquipment());
         updateList();
         closeEquipmentEditor();
+        fireEvent(new GridUpdatedEvent(this));
     }
 
     private Equipment setEquipmentStatus(Equipment equipment)

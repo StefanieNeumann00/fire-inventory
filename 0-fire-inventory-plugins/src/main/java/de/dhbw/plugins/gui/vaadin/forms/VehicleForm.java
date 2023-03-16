@@ -7,9 +7,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.radiobutton.RadioGroupVariant;
 import com.vaadin.flow.component.textfield.TextField;
@@ -27,6 +25,7 @@ public class VehicleForm extends FormLayout {
     ComboBox<Place> placeComboBox = new ComboBox<>("Place");
     RadioButtonGroup<String> conditionRadioGroup = new RadioButtonGroup<>();
     Button save = new Button("Save");
+    Button delete = new Button("delete");
     Button close = new Button("Cancel");
     Binder<Vehicle> binder = new BeanValidationBinder<>(Vehicle.class);
     private Vehicle vehicle = new Vehicle();
@@ -36,11 +35,11 @@ public class VehicleForm extends FormLayout {
         placeComboBox.setItemLabelGenerator(Place::getDesignation);
         createConditionRadioButton();
 
-        add(this.createTextFieldLayout(),createButtonsLayout());
+        this.createConditionRadioButton();
+        add(designationTextField, placeComboBox, conditionRadioGroup,createButtonsLayout());
         binder.bind(designationTextField, "designation");
         binder.bind(placeComboBox, "place");
         binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
-
     }
 
     private void createConditionRadioButton()
@@ -56,26 +55,19 @@ public class VehicleForm extends FormLayout {
         binder.readBean(vehicle);
     }
 
-    private VerticalLayout createTextFieldLayout()
-    {
-        VerticalLayout textFieldLayout = new VerticalLayout();
-        this.createConditionRadioButton();
-        textFieldLayout.add(designationTextField, placeComboBox, conditionRadioGroup);
-        textFieldLayout.setAlignItems(FlexComponent.Alignment.CENTER);
-        return textFieldLayout;
-    }
-
     private HorizontalLayout createButtonsLayout() {
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
         close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 
         save.addClickShortcut(Key.ENTER);
         close.addClickShortcut(Key.ESCAPE);
 
         save.addClickListener(event -> validateAndSave());
+        delete.addClickListener(event -> fireEvent(new VehicleForm.DeleteEvent(this, vehicle)));
         close.addClickListener(event -> fireEvent(new VehicleForm.CloseEvent(this)));
 
-        return new HorizontalLayout(save, close);
+        return new HorizontalLayout(save, delete, close);
     }
 
     public void validateAndSave() {

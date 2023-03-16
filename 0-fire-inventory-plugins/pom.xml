@@ -24,9 +24,6 @@
         <repository>
             <id>Vaadin Directory</id>
             <url>https://maven.vaadin.com/vaadin-addons</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
         </repository>
     </repositories>
 
@@ -137,13 +134,14 @@
         </dependency>
 
         <dependency>
-            <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-spring-boot-starter</artifactId>
+            <groupId>org.vaadin.addons.flowingcode</groupId>
+            <artifactId>year-month-calendar</artifactId>
+            <version>2.2.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-charts-flow</artifactId>
+            <artifactId>vaadin-spring-boot-starter</artifactId>
         </dependency>
 
         <dependency>

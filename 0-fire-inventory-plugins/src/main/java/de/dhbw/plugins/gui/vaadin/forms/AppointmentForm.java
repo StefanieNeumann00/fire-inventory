@@ -5,19 +5,27 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.shared.Registration;
 import de.dhbw.fireinventory.domain.appointment.Appointment;
+import de.dhbw.fireinventory.domain.item.Item;
+
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.List;
 
-public abstract class AppointmentForm extends FormLayout {
+public class AppointmentForm extends FormLayout {
 
+    ComboBox<Item> itemComboBox = new ComboBox<>("Item");
     TextField appointmentDesignation;
     DatePicker dueDatePicker;
     Button save;
@@ -25,6 +33,28 @@ public abstract class AppointmentForm extends FormLayout {
     Button cancel;
     Binder<Appointment> binder;
     protected Appointment appointment;
+
+    public AppointmentForm(List<Item> items) {
+        binder = new BeanValidationBinder<>(Appointment.class);
+        appointment = new Appointment();
+
+        itemComboBox.setItems(items);
+        itemComboBox.setItemLabelGenerator(Item::getDesignation);
+
+        configureForm();
+
+        add(appointmentDesignation, itemComboBox, dueDatePicker, createButtonsLayout());
+    }
+
+    public void setItem(Item item) {
+        itemComboBox.setValue(item);
+    }
+
+    public void setAppointment(Appointment appointment) { this.appointment = appointment; }
+
+    public void setDate(Date date) { this.dueDatePicker.setValue(date.toInstant()
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate()); }
 
     protected void configureForm() {
         appointmentDesignation = new TextField("Appointment Designation");

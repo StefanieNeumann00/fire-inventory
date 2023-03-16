@@ -14,7 +14,7 @@ public class AppointmentToAppointmentResourceMapper implements Function<Appointm
     }
 
     private AppointmentResource map(final Appointment appointment) {
-        return new AppointmentResource(appointment.getDesignation(), appointment.getVehicle(), appointment.getEquipment(), appointment.getDueDate(), appointment.getEndDate(), appointment.getInterval());
+        return new AppointmentResource(appointment.getDesignation(), appointment.getItem(), appointment.getDueDate());
     }
 
 }

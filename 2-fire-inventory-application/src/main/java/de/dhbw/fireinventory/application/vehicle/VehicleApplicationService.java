@@ -1,6 +1,7 @@
 package de.dhbw.fireinventory.application.vehicle;
 
-import de.dhbw.fireinventory.domain.equipment.Equipment;
+import de.dhbw.fireinventory.domain.item.Item;
+import de.dhbw.fireinventory.domain.item.ItemRepository;
 import de.dhbw.fireinventory.domain.location.Location;
 import de.dhbw.fireinventory.domain.location.LocationRepository;
 import de.dhbw.fireinventory.domain.place.Place;
@@ -17,10 +18,13 @@ public class VehicleApplicationService {
 
     private LocationRepository locationRepository;
     private final VehicleRepository vehicleRepository;
+    private final ItemRepository itemRepository;
+
     @Autowired
-    public VehicleApplicationService(final VehicleRepository vehicleRepository, LocationRepository locationRepository) {
+    public VehicleApplicationService(final VehicleRepository vehicleRepository, LocationRepository locationRepository, ItemRepository itemRepository) {
         this.vehicleRepository = vehicleRepository;
         this.locationRepository = locationRepository;
+        this.itemRepository = itemRepository;
     }
 
     public List<Vehicle> findAllVehicles(String filterText) {
@@ -40,9 +44,14 @@ public class VehicleApplicationService {
 
     public void saveVehicle(Vehicle vehicle){
         this.vehicleRepository.save(vehicle);
+
         Location location = new Location();
         location.setVehicle(vehicle);
         this.locationRepository.save(location);
+
+        Item item = new Item();
+        item.setVehicle(vehicle);
+        this.itemRepository.save(item);
     }
 
     public void deleteVehicle(Vehicle vehicle) { this.vehicleRepository.delete(vehicle); }
