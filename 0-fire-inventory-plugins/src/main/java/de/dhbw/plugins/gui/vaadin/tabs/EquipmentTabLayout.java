@@ -14,6 +14,7 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.shared.Registration;
 import de.dhbw.fireinventory.application.appointment.AppointmentApplicationService;
 import de.dhbw.fireinventory.application.equipment.EquipmentApplicationService;
+import de.dhbw.fireinventory.application.item.ItemApplicationService;
 import de.dhbw.fireinventory.application.location.LocationApplicationService;
 import de.dhbw.fireinventory.application.status.StatusApplicationService;
 import de.dhbw.fireinventory.domain.appointment.Appointment;
@@ -21,7 +22,9 @@ import de.dhbw.fireinventory.domain.equipment.Equipment;
 import de.dhbw.fireinventory.domain.location.Location;
 import de.dhbw.fireinventory.domain.status.Status;
 import de.dhbw.plugins.gui.vaadin.components.EquipmentGrid;
+import de.dhbw.plugins.gui.vaadin.components.ErrorMessage;
 import de.dhbw.plugins.gui.vaadin.forms.*;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.time.ZoneId;
 import java.util.Date;
@@ -34,18 +37,18 @@ public class EquipmentTabLayout extends AbstractTabLayout {
     EquipmentApplicationService equipmentService;
     LocationApplicationService locationService;
     StatusApplicationService statusService;
-    AppointmentApplicationService appointmentService;
+    ItemApplicationService itemService;
     ComboBox<Location> locationComboBox;
     ComboBox<Status> statusComboBox;
 
-    public EquipmentTabLayout(EquipmentApplicationService equipmentService, LocationApplicationService locationService, StatusApplicationService statusService, AppointmentApplicationService appointmentService)
+    public EquipmentTabLayout(EquipmentApplicationService equipmentService, LocationApplicationService locationService, StatusApplicationService statusService, ItemApplicationService itemService)
     {
         super();
 
         this.equipmentService = equipmentService;
         this.locationService = locationService;
         this.statusService = statusService;
-        this.appointmentService = appointmentService;
+        this.itemService = itemService;
 
         configureGrid();
         configureEquipmentForm();
@@ -82,10 +85,6 @@ public class EquipmentTabLayout extends AbstractTabLayout {
     }
 
     private void addAppointment(Equipment equipment) {}
-
-    private void deleteAppointment(AppointmentForm.DeleteEvent event) {
-        appointmentService.deleteAppointment(event.getAppointment());
-    }
 
     private VerticalLayout getToolbar() {
         filterText.setPlaceholder("...");
@@ -164,10 +163,17 @@ public class EquipmentTabLayout extends AbstractTabLayout {
     }
 
     private void deleteEquipment(EquipmentForm.DeleteEvent event) {
-        equipmentService.deleteEquipment(event.getEquipment());
-        updateList();
-        closeEquipmentEditor();
-        fireEvent(new GridUpdatedEvent(this));
+        try {
+            Equipment equipment = event.getEquipment();
+            itemService.deleteItem(equipment);
+            equipmentService.deleteEquipment(equipment);
+            updateList();
+            closeEquipmentEditor();
+            fireEvent(new GridUpdatedEvent(this));
+        }
+        catch (DataIntegrityViolationException exception) {
+            new ErrorMessage("You cannot delete this vehicle since there are still equipments attached.");
+        }
     }
 
     private Equipment setEquipmentStatus(Equipment equipment)

@@ -6,8 +6,8 @@ import de.dhbw.fireinventory.domain.item.Item;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -37,17 +37,17 @@ public class AppointmentApplicationService {
         if (item == null && designation.isEmpty()) {
             return this.findAllSortedByDate();
         } else if (item == null && !designation.isEmpty()) {
-            return this.appointmentRepository.findAppointmentsFor(designation);
+            return this.appointmentRepository.findAppointmentsForDesignation(designation);
         } else if (item != null && designation.isEmpty()) {
-            return this.appointmentRepository.findAppointmentsFor(item);
+            return this.appointmentRepository.findAppointmentsForItem(item);
         } else {
-            return this.appointmentRepository.findAppointmentsFor(item, designation);
+            return this.appointmentRepository.findAppointmentsForItemAndDes(item, designation);
         }
     }
 
-    public List<Date> findAppointmentDatesFor(Item item, String designation) {
+    public List<LocalDate> findAppointmentDatesFor(Item item, String designation) {
         List<Appointment> appointments = this.findAllAppointmentsFor(item, designation);
-        List<Date> dates = new ArrayList<>();
+        List<LocalDate> dates = new ArrayList<>();
         for (Appointment appointment: appointments) {
             dates.add(appointment.getDueDate());
         }

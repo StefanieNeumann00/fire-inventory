@@ -12,9 +12,9 @@ public interface AppointmentRepository {
 
     void delete(Appointment appointment);
 
-    List<Appointment> findAppointmentsFor(Item item);
+    List<Appointment> findAppointmentsForItem(Item item);
 
-    List<Appointment> findAppointmentsFor(String designation);
+    List<Appointment> findAppointmentsForDesignation(String designation);
 
-    List<Appointment> findAppointmentsFor(Item item, String designation);
+    List<Appointment> findAppointmentsForItemAndDes(Item item, String designation);
 }

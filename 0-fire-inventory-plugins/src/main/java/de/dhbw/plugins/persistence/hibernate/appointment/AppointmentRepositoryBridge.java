@@ -34,17 +34,17 @@ public class AppointmentRepositoryBridge implements AppointmentRepository {
     }
 
     @Override
-    public List<Appointment> findAppointmentsFor(Item item) {
-        return this.springDataAppointmentRepository.findFor(item);
+    public List<Appointment> findAppointmentsForItem(Item item) {
+        return this.springDataAppointmentRepository.findForItem(item);
     }
 
     @Override
-    public List<Appointment> findAppointmentsFor(String designation) {
-        return this.springDataAppointmentRepository.findFor(designation);
+    public List<Appointment> findAppointmentsForDesignation(String designation) {
+        return this.springDataAppointmentRepository.findForDesignation(designation);
     }
 
     @Override
-    public List<Appointment> findAppointmentsFor(Item item, String designation) {
-        return this.springDataAppointmentRepository.findFor(item, designation);
+    public List<Appointment> findAppointmentsForItemAndDes(Item item, String designation) {
+        return this.springDataAppointmentRepository.findForItemAndDes(item, designation);
     }
 }

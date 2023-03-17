@@ -15,11 +15,11 @@ public interface SpringDataAppointmentRepository extends JpaRepository<Appointme
     public List<Appointment> findAllSortedByDate();
 
     @Query(value = "select a from Appointment a where a.item = :item")
-    public List<Appointment> findFor(@Param("item") Item item);
+    public List<Appointment> findForItem(@Param("item") Item item);
 
-    @Query(value = "select a from Appointment a where a.item = :item and a.designation = :designation")
-    public List<Appointment> findFor(@Param("item") Item item, @Param("designation") String designation);
+    @Query(value = "select a from Appointment a where a.item = :item and lower(a.designation) like lower(concat('%', :designation, '%'))")
+    public List<Appointment> findForItemAndDes(@Param("item") Item item, @Param("designation") String designation);
 
-    @Query(value = "select a from Appointment a where a.designation = :designation")
-    public List<Appointment> findFor(@Param("designation") String designation);
+    @Query(value = "select a from Appointment a where lower(a.designation) like lower(concat('%', :designation, '%'))")
+    public List<Appointment> findForDesignation(@Param("designation") String designation);
 }

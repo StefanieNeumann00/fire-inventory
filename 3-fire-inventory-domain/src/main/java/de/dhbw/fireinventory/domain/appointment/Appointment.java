@@ -6,7 +6,7 @@ import de.dhbw.fireinventory.domain.item.Item;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "appointment")
@@ -21,7 +21,7 @@ public class Appointment extends AbstractEntity {
     private Item item;
 
     @NotNull
-    private Date dueDate;
+    private LocalDate dueDate;
 
     public String getDesignation() {
         return designation;
@@ -39,7 +39,7 @@ public class Appointment extends AbstractEntity {
         this.item = item;
     }
 
-    public Date getDueDate() { return dueDate; }
+    public LocalDate getDueDate() { return dueDate; }
 
-    public void setDueDate(Date dueDate) { this.dueDate = dueDate; }
+    public void setDueDate(LocalDate dueDate) { this.dueDate = dueDate; }
 }

@@ -19,6 +19,7 @@ import de.dhbw.plugins.gui.vaadin.forms.AppointmentForm;
 import de.dhbw.plugins.gui.vaadin.forms.ListViewForm;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
@@ -56,16 +57,17 @@ public class Calendar extends VerticalLayout {
         calendar.addDateSelectedListener(e -> createAppointmentForDate(Date.from(e.getDate().atStartOfDay()
                 .atZone(ZoneId.systemDefault())
                 .toInstant())));
-        updateCalendarView();
 
-        HorizontalLayout content = new HorizontalLayout(calendar, appointmentForm);
+        HorizontalLayout content = new HorizontalLayout(calendar, appointmentForm, listView);
 
         content.setFlexGrow(2, calendar);
-        content.setFlexGrow(1, appointmentForm);
+        content.setFlexGrow(1, appointmentForm, listView);
 
         content.addClassNames("content");
         content.setSizeFull();
         content.setHeightFull();
+
+        updateCalendarView();
 
         return content;
     }
@@ -100,22 +102,22 @@ public class Calendar extends VerticalLayout {
     }
 
     private void updateCalendarView() {
-        List<Date> dates = appointmentService.findAppointmentDatesFor(itemComboBox.getValue(), filterText.getValue());
+        List<LocalDate> dates = appointmentService.findAppointmentDatesFor(itemComboBox.getValue(), filterText.getValue());
         calendar.setClassNameGenerator(date -> {
             if (date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.SUNDAY) {
                 return "weekend";
             }
-            else if(dates.contains(date))
-            {
-                return "appointment-set";
+            for (LocalDate appointment: dates) {
+                if(appointment.compareTo(date) == 0) { return "appointment-set"; }
             }
             return null;
         });
+        calendar.refreshAll();
         updateViewList();
+        closeAppointmentEditor();
     }
 
     private void updateViewList() {
-        closeAppointmentEditor();
         listView.setAppointments(appointmentService.findAllAppointmentsFor(itemComboBox.getValue(), filterText.getValue()));
         listView.setVisible(true);
         addClassName("editing");
@@ -153,6 +155,7 @@ public class Calendar extends VerticalLayout {
         appointmentForm.setAppointment(null);
         appointmentForm.setVisible(false);
         removeClassName("editing");
+        updateViewList();
     }
 
     private void configureAppointmentForm() {
@@ -169,7 +172,7 @@ public class Calendar extends VerticalLayout {
 
     private void saveAppointment(AppointmentForm.SaveEvent event) {
         Appointment appointment = event.getAppointment();
-        Date date = Date.from(appointmentForm.getDueDate().atStartOfDay(ZoneId.systemDefault()).toInstant());
+        LocalDate date = appointmentForm.getDueDate();
         appointment.setDueDate(date);
         appointmentService.saveAppointment(appointment);
         updateCalendarView();
@@ -178,6 +181,7 @@ public class Calendar extends VerticalLayout {
 
     private void configureAppointmentList() {
         listView = new ListViewForm(appointmentService.findAllAppointmentsFor(itemComboBox.getValue(), filterText.getValue()));
-        appointmentForm.setWidth("25em");
+        listView.addListener(ListViewForm.SelectEvent.class, e -> editAppointment(e.getAppointment()));
+        listView.setWidth("25em");
     }
 }

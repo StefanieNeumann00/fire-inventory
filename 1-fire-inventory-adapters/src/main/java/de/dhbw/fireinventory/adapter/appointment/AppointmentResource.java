@@ -4,6 +4,7 @@ import de.dhbw.fireinventory.domain.equipment.Equipment;
 import de.dhbw.fireinventory.domain.item.Item;
 import de.dhbw.fireinventory.domain.vehicle.Vehicle;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 
@@ -13,9 +14,9 @@ public class AppointmentResource {
 
     private final Item item;
 
-    private final Date dueDate;
+    private final LocalDate dueDate;
 
-    public AppointmentResource(final String designation, final Item item, final Date dueDate) {
+    public AppointmentResource(final String designation, final Item item, final LocalDate dueDate) {
         this.designation = designation;
         this.item = item;
         this.dueDate = dueDate;
@@ -29,7 +30,7 @@ public class AppointmentResource {
         return item;
     }
 
-    public Date getDueDate() {
+    public LocalDate getDueDate() {
         return dueDate;
     }
 }

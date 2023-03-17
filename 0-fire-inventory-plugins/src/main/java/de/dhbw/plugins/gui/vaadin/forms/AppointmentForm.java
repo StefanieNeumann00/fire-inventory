@@ -50,7 +50,10 @@ public class AppointmentForm extends FormLayout {
         itemComboBox.setValue(item);
     }
 
-    public void setAppointment(Appointment appointment) { this.appointment = appointment; }
+    public void setAppointment(Appointment appointment) {
+        this.appointment = appointment;
+        binder.readBean(appointment);
+    }
 
     public void setDate(Date date) { this.dueDatePicker.setValue(date.toInstant()
             .atZone(ZoneId.systemDefault())
@@ -61,6 +64,7 @@ public class AppointmentForm extends FormLayout {
         dueDatePicker = new DatePicker("Due Date");
 
         binder.bind(appointmentDesignation, "designation");
+        binder.bind(itemComboBox, "item");
         binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
     }
 

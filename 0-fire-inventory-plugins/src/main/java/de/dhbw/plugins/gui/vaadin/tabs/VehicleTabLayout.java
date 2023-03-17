@@ -10,6 +10,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import de.dhbw.fireinventory.application.appointment.AppointmentApplicationService;
+import de.dhbw.fireinventory.application.item.ItemApplicationService;
 import de.dhbw.fireinventory.application.location.LocationApplicationService;
 import de.dhbw.fireinventory.application.place.PlaceApplicationService;
 import de.dhbw.fireinventory.application.status.StatusApplicationService;
@@ -33,13 +34,15 @@ public class VehicleTabLayout extends AbstractTabLayout{
     StatusApplicationService statusService;
     VehicleApplicationService vehicleService;
     AppointmentApplicationService appointmentService;
+    ItemApplicationService itemService;
     ComboBox<Place> placeComboBox;
     ComboBox<Status> statusComboBox;
 
-    public VehicleTabLayout(LocationApplicationService locationService, PlaceApplicationService placeService, StatusApplicationService statusService, VehicleApplicationService vehicleService, AppointmentApplicationService appointmentService)
+    public VehicleTabLayout(LocationApplicationService locationService, ItemApplicationService itemService, PlaceApplicationService placeService, StatusApplicationService statusService, VehicleApplicationService vehicleService, AppointmentApplicationService appointmentService)
     {
         super();
 
+        this.itemService = itemService;
         this.locationService = locationService;
         this.placeService = placeService;
         this.statusService = statusService;
@@ -127,6 +130,7 @@ public class VehicleTabLayout extends AbstractTabLayout{
     private void deleteVehicle(VehicleForm.DeleteEvent event) {
         try {
             locationService.deleteLocation(event.getVehicle());
+            itemService.deleteItem(event.getVehicle());
             vehicleService.deleteVehicle(event.getVehicle());
             updateList();
             closeVehicleEditor();

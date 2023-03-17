@@ -8,6 +8,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.dhbw.fireinventory.application.appointment.AppointmentApplicationService;
 import de.dhbw.fireinventory.application.equipment.EquipmentApplicationService;
+import de.dhbw.fireinventory.application.item.ItemApplicationService;
 import de.dhbw.fireinventory.application.location.LocationApplicationService;
 import de.dhbw.fireinventory.application.place.PlaceApplicationService;
 import de.dhbw.fireinventory.application.status.StatusApplicationService;
@@ -28,6 +29,7 @@ public class Inventory extends VerticalLayout {
     StatusApplicationService statusService;
     VehicleApplicationService vehicleService;
     AppointmentApplicationService appointmentService;
+    ItemApplicationService itemService;
 
     EquipmentTabLayout equipmentTabLayout;
     VehicleTabLayout vehicleTabLayout;
@@ -41,13 +43,14 @@ public class Inventory extends VerticalLayout {
     Tab placeTab;
 
     @Autowired
-    public Inventory(EquipmentApplicationService equipmentService, LocationApplicationService locationService, PlaceApplicationService placeService, StatusApplicationService statusService, VehicleApplicationService vehicleService, AppointmentApplicationService appointmentService) {
+    public Inventory(EquipmentApplicationService equipmentService, ItemApplicationService itemService, LocationApplicationService locationService, PlaceApplicationService placeService, StatusApplicationService statusService, VehicleApplicationService vehicleService, AppointmentApplicationService appointmentService) {
         this.equipmentService = equipmentService;
         this.locationService = locationService;
         this.placeService = placeService;
         this.statusService = statusService;
         this.vehicleService = vehicleService;
         this.appointmentService = appointmentService;
+        this.itemService = itemService;
 
         setSizeFull();
         setHeightFull();
@@ -70,10 +73,10 @@ public class Inventory extends VerticalLayout {
     }
 
     private void configureLayouts() {
-        equipmentTabLayout = new EquipmentTabLayout(equipmentService, locationService, statusService, appointmentService);
+        equipmentTabLayout = new EquipmentTabLayout(equipmentService, locationService, statusService, itemService);
         equipmentTabLayout.addListener(EquipmentTabLayout.GridUpdatedEvent.class, e -> updateBadge());
 
-        vehicleTabLayout = new VehicleTabLayout(locationService, placeService, statusService, vehicleService, appointmentService);
+        vehicleTabLayout = new VehicleTabLayout(locationService, itemService, placeService, statusService, vehicleService, appointmentService);
         equipmentTabLayout.addListener(EquipmentTabLayout.GridUpdatedEvent.class, e -> updateBadge());
 
         placeTabLayout = new PlaceTabLayout(locationService, placeService);
