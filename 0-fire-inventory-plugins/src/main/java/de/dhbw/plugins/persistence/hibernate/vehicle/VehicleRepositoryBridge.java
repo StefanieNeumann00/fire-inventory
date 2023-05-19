@@ -1,9 +1,7 @@
 package de.dhbw.plugins.persistence.hibernate.vehicle;
 
-import de.dhbw.fireinventory.domain.equipment.Equipment;
-import de.dhbw.fireinventory.domain.location.Location;
-import de.dhbw.fireinventory.domain.place.Place;
 import de.dhbw.fireinventory.domain.status.Status;
+import de.dhbw.fireinventory.domain.location.Location;
 import de.dhbw.fireinventory.domain.vehicle.Vehicle;
 import de.dhbw.fireinventory.domain.vehicle.VehicleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,26 +35,26 @@ public class VehicleRepositoryBridge implements VehicleRepository {
     }
 
     @Override
-    public int vehicleStatusCount(final String status) { return this.springDataVehicleRepository.vehicleStatusCount(status);}
+    public int vehicleStatusCount(final Status status) { return this.springDataVehicleRepository.vehicleStatusCount(status);}
 
     @Override
-    public List<Vehicle> findAllByPlace(Place place) {
-        return this.springDataVehicleRepository.findAllByPlace(place);
+    public List<Vehicle> findAllByLocation(Location location) {
+        return this.springDataVehicleRepository.findAllByLocation(location);
     }
 
     @Override
-    public List<Vehicle> findAllByPlaceAndDesignation(Place place, String designation) {
-        return this.springDataVehicleRepository.findAllByPlaceAndDesignation(place, designation);
+    public List<Vehicle> findAllByLocationAndDesignation(Location location, String designation) {
+        return this.springDataVehicleRepository.findAllByLocationAndDesignation(location, designation);
     }
 
     @Override
-    public List<Vehicle> findAllByPlaceAndStatus(Place place, Status status) {
-        return this.springDataVehicleRepository.findAllByPlaceAndStatus(place, status);
+    public List<Vehicle> findAllByLocationAndStatus(Location location, Status status) {
+        return this.springDataVehicleRepository.findAllByLocationAndStatus(location, status);
     }
 
     @Override
-    public List<Vehicle> findAllByPlaceStatusAndDesignation(Place place, Status status, String designation) {
-        return this.springDataVehicleRepository.findAllByPlaceStatusAndDesignation(place, status, designation);
+    public List<Vehicle> findAllByLocationStatusAndDesignation(Location location, Status status, String designation) {
+        return this.springDataVehicleRepository.findAllByLocationStatusAndDesignation(location, status, designation);
     }
 
     @Override

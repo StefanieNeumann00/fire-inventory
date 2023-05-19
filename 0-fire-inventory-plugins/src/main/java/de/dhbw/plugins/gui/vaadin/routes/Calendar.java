@@ -20,8 +20,6 @@ import de.dhbw.plugins.gui.vaadin.forms.ListViewForm;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.List;
 
 @Route(value = "dashboard", layout = MainLayout.class)
@@ -54,9 +52,7 @@ public class Calendar extends VerticalLayout {
         configureAppointmentList();
 
         calendar = new YearCalendar();
-        calendar.addDateSelectedListener(e -> createAppointmentForDate(Date.from(e.getDate().atStartOfDay()
-                .atZone(ZoneId.systemDefault())
-                .toInstant())));
+        calendar.addDateSelectedListener(e -> createAppointmentForDate(e.getDate()));
 
         HorizontalLayout content = new HorizontalLayout(calendar, appointmentForm, listView);
 
@@ -137,10 +133,13 @@ public class Calendar extends VerticalLayout {
             appointmentForm.setAppointment(appointment);
             appointmentForm.setVisible(true);
             addClassName("editing");
+            if (itemComboBox.getValue() != null) {
+                appointmentForm.setItem(itemComboBox.getValue());
+            }
         }
     }
 
-    private void createAppointmentForDate(Date date) {
+    private void createAppointmentForDate(LocalDate date) {
         editAppointment(new Appointment());
         appointmentForm.setDate(date);
     }

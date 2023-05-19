@@ -9,8 +9,8 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.shared.Registration;
 import de.dhbw.fireinventory.application.vehicle.VehicleApplicationService;
-import de.dhbw.fireinventory.domain.place.Place;
 import de.dhbw.fireinventory.domain.status.Status;
+import de.dhbw.fireinventory.domain.location.Location;
 import de.dhbw.fireinventory.domain.vehicle.Vehicle;
 
 public class VehicleGrid extends AbstractGrid<Vehicle> {
@@ -25,7 +25,7 @@ public class VehicleGrid extends AbstractGrid<Vehicle> {
     protected void configureGridColumns() {
         this.getColumns().forEach(col -> col.setAutoWidth(true));
         this.addColumn(Vehicle::getDesignation).setHeader("Bezeichnung");
-        this.addColumn(v -> v.getPlace().getDesignation()).setHeader("Abstellort");
+        this.addColumn(v -> v.getLocation().getDesignation()).setHeader("Abstellort");
         this.addColumn(v -> v.getStatus().getDesignation()).setHeader("Status");
         this.addColumn(
                 new ComponentRenderer<>(Button::new, (button, vehicle) -> {
@@ -38,8 +38,8 @@ public class VehicleGrid extends AbstractGrid<Vehicle> {
                 fireEvent(new VehicleGrid.EditVehicleEvent(this, event.getValue())));
     }
 
-    public void updateList(Place place, Status status, String filterText) {
-        this.setItems(vehicleService.findAllVehiclesBy(place, status, filterText));
+    public void updateList(Location location, Status status, String filterText) {
+        this.setItems(vehicleService.findAllVehiclesBy(location, status, filterText));
     }
 
     public static abstract class VehicleGridEvent extends ComponentEvent<VehicleGrid> {

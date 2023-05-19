@@ -29,7 +29,7 @@ public class LocationController {
 
     @RequestMapping(method = RequestMethod.GET)
     public List<LocationResource> getLocations() {
-        return this.locationApplicationService.findAllLocations().stream()
+        return this.locationApplicationService.findAllLocations(null).stream()
                 .map(locationToLocationResourceMapper)
                 .collect(Collectors.toList());
     }

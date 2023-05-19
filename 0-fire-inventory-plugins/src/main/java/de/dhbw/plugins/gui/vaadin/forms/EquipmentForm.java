@@ -16,6 +16,7 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.shared.Registration;
+import de.dhbw.fireinventory.domain.Condition;
 import de.dhbw.fireinventory.domain.equipment.Equipment;
 import de.dhbw.fireinventory.domain.location.Location;
 
@@ -24,7 +25,7 @@ import java.util.List;
 public class EquipmentForm extends FormLayout {
         TextField designationTextField = new TextField("Designation");
         ComboBox<Location> locationComboBox = new ComboBox<>("Location");
-        RadioButtonGroup<String> conditionRadioGroup = new RadioButtonGroup<>();
+        RadioButtonGroup<Condition> conditionRadioGroup = new RadioButtonGroup<>();
         Button save = new Button("Save");
         Button delete = new Button("delete");
         Button cancel = new Button("Cancel");
@@ -46,8 +47,8 @@ public class EquipmentForm extends FormLayout {
         {
             conditionRadioGroup.addThemeVariants(RadioGroupVariant.LUMO_VERTICAL);
             conditionRadioGroup.setLabel("Zustand");
-            conditionRadioGroup.setItems("funktionsfähig", "nicht funktionsfähig");
-            conditionRadioGroup.setValue("funktionsfähig");
+            conditionRadioGroup.setItems(Condition.values());
+            conditionRadioGroup.setValue(Condition.FUNKTIONSFÄHIG);
         }
 
         public void setEquipment(Equipment equipment) {
@@ -74,7 +75,7 @@ public class EquipmentForm extends FormLayout {
             return layout;
         }
 
-        public String getConditionRadioButtonValue()
+        public Condition getConditionRadioButtonValue()
         {
             return conditionRadioGroup.getValue();
         }

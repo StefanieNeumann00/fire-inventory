@@ -1,8 +1,8 @@
 package de.dhbw.fireinventory.application.appointment;
 
+import de.dhbw.fireinventory.domain.item.Item;
 import de.dhbw.fireinventory.domain.appointment.Appointment;
 import de.dhbw.fireinventory.domain.appointment.AppointmentRepository;
-import de.dhbw.fireinventory.domain.item.Item;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

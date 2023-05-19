@@ -1,30 +1,21 @@
 package de.dhbw.fireinventory.adapter.item;
 
-import de.dhbw.fireinventory.domain.equipment.Equipment;
-import de.dhbw.fireinventory.domain.place.Place;
-import de.dhbw.fireinventory.domain.vehicle.Vehicle;
+import de.dhbw.fireinventory.domain.location.Location;
 
 public class ItemResource {
 
     private final String designation;
 
-    private final Vehicle vehicle;
+    private final Location location;
 
-    private final Equipment equipment;
-
-    public ItemResource(final String designation, final Vehicle vehicle, final Equipment equipment) {
+    public ItemResource(final String designation, final Location location) {
         this.designation = designation;
-        this.vehicle = vehicle;
-        this.equipment = equipment;
+        this.location = location;
     }
 
     public String getDesignation() { return designation; }
 
-    public Vehicle getVehicle() {
-        return vehicle;
-    }
-
-    public Equipment getEquipment() {
-        return equipment;
+    public Location getLocation() {
+        return location;
     }
 }

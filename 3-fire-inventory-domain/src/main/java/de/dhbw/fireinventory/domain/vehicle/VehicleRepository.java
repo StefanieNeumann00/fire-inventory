@@ -1,9 +1,7 @@
 package de.dhbw.fireinventory.domain.vehicle;
 
-import de.dhbw.fireinventory.domain.equipment.Equipment;
-import de.dhbw.fireinventory.domain.location.Location;
-import de.dhbw.fireinventory.domain.place.Place;
 import de.dhbw.fireinventory.domain.status.Status;
+import de.dhbw.fireinventory.domain.location.Location;
 
 import java.util.List;
 
@@ -15,15 +13,15 @@ public interface VehicleRepository {
 
     void delete(Vehicle vehicle);
 
-    int vehicleStatusCount(String status);
+    int vehicleStatusCount(Status status);
 
-    List<Vehicle> findAllByPlace(Place place);
+    List<Vehicle> findAllByLocation(Location location);
 
-    List<Vehicle> findAllByPlaceAndDesignation(Place place, String designation);
+    List<Vehicle> findAllByLocationAndDesignation(Location location, String designation);
 
-    List<Vehicle> findAllByPlaceAndStatus(Place place, Status status);
+    List<Vehicle> findAllByLocationAndStatus(Location location, Status status);
 
-    List<Vehicle> findAllByPlaceStatusAndDesignation(Place place, Status status, String designation);
+    List<Vehicle> findAllByLocationStatusAndDesignation(Location location, Status status, String designation);
 
     List<Vehicle> findAllByStatus(Status status);
 

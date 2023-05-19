@@ -9,28 +9,26 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import de.dhbw.fireinventory.application.location.LocationApplicationService;
-import de.dhbw.fireinventory.application.place.PlaceApplicationService;
-import de.dhbw.fireinventory.domain.place.Place;
+import de.dhbw.fireinventory.domain.location.InternalPlace;
+import de.dhbw.fireinventory.domain.location.Location;
 import de.dhbw.plugins.gui.vaadin.components.ErrorMessage;
-import de.dhbw.plugins.gui.vaadin.components.PlaceGrid;
-import de.dhbw.plugins.gui.vaadin.forms.PlaceForm;
+import de.dhbw.plugins.gui.vaadin.components.LocationGrid;
+import de.dhbw.plugins.gui.vaadin.forms.LocationForm;
 import org.springframework.dao.DataIntegrityViolationException;
 
-public class PlaceTabLayout extends AbstractTabLayout{
+public class LocationTabLayout extends AbstractTabLayout{
 
-    PlaceGrid grid;
+    LocationGrid grid;
     TextField filterText = new TextField("Bezeichnung");
     HorizontalLayout filterLayout;
-    PlaceForm placeForm;
+    LocationForm locationForm;
     LocationApplicationService locationService;
-    PlaceApplicationService placeService;
 
-    public PlaceTabLayout(LocationApplicationService locationService, PlaceApplicationService placeService)
+    public LocationTabLayout(LocationApplicationService locationService)
     {
         super();
 
         this.locationService = locationService;
-        this.placeService = placeService;
 
         configureGrid();
         configurePlaceForm();
@@ -40,18 +38,18 @@ public class PlaceTabLayout extends AbstractTabLayout{
     }
 
     private void configurePlaceForm() {
-        placeForm = new PlaceForm();
-        placeForm.setWidth("25em");
-        placeForm.addListener(PlaceForm.SaveEvent.class, this::savePlace);
-        placeForm.addListener(PlaceForm.DeleteEvent.class, this::deletePlace);
-        placeForm.addListener(PlaceForm.CloseEvent.class, e -> closePlaceEditor());
+        locationForm = new LocationForm();
+        locationForm.setWidth("25em");
+        locationForm.addListener(LocationForm.SaveEvent.class, this::savePlace);
+        locationForm.addListener(LocationForm.DeleteEvent.class, this::deletePlace);
+        locationForm.addListener(LocationForm.CloseEvent.class, e -> closePlaceEditor());
     }
 
     private HorizontalLayout getContent() {
-        HorizontalLayout content = new HorizontalLayout(grid, placeForm);
+        HorizontalLayout content = new HorizontalLayout(grid, locationForm);
 
         content.setFlexGrow(2, grid);
-        content.setFlexGrow(1, placeForm);
+        content.setFlexGrow(1, locationForm);
 
         content.addClassNames("content");
         content.setSizeFull();
@@ -61,46 +59,46 @@ public class PlaceTabLayout extends AbstractTabLayout{
     }
 
     protected void configureGrid() {
-        grid = new PlaceGrid(placeService);
-        grid.addListener(PlaceGrid.EditPlaceEvent.class, e -> editPlace(e.getPlace()));
+        grid = new LocationGrid(locationService);
+        grid.addListener(LocationGrid.EditLocationEvent.class, e -> editLocation(e.getLocation()));
     }
 
-    private void editPlace(Place place) {
-        if (place == null) {
+    private void editLocation(Location location) {
+        if (location == null) {
             closePlaceEditor();
         } else {
-            placeForm.setPlace(place);
-            placeForm.setVisible(true);
+            locationForm.setLocation(location);
+            locationForm.setVisible(true);
             addClassName("editing");
         }
     }
 
     private void closePlaceEditor() {
-        placeForm.setPlace(null);
-        placeForm.setVisible(false);
+        locationForm.setLocation(null);
+        locationForm.setVisible(false);
         removeClassName("editing");
     }
 
-    private void addPlace() {
+    private void addInternalLocation() {
         grid.clearGridSelection();
-        editPlace(new Place());
+        editLocation(new InternalPlace());
     }
 
     private void updateList() {
         grid.updateList(filterText.getValue());
     }
 
-    private void savePlace(PlaceForm.SaveEvent event) {
-        Place place = event.getPlace();
-        placeService.savePlace(place);
+    private void savePlace(LocationForm.SaveEvent event) {
+        Location location = event.getLocation();
+        locationService.saveLocation(location);
         updateList();
         closePlaceEditor();
     }
 
-    private void deletePlace(PlaceForm.DeleteEvent event) {
+    private void deletePlace(LocationForm.DeleteEvent event) {
         try {
-            locationService.deleteLocation(event.getPlace());
-            placeService.deletePlace(event.getPlace());
+            locationService.deleteLocation(event.getLocation());
+            locationService.deleteLocation(event.getLocation());
             updateList();
             closePlaceEditor();
         }
@@ -121,7 +119,7 @@ public class PlaceTabLayout extends AbstractTabLayout{
 
         Button addPlaceButton = new Button("Add Place");
 
-        addPlaceButton.addClickListener(event -> addPlace());
+        addPlaceButton.addClickListener(event -> addInternalLocation());
 
         HorizontalLayout buttonsLayout = new HorizontalLayout(filterIcon, addPlaceButton);
         buttonsLayout.setAlignItems(FlexComponent.Alignment.CENTER);

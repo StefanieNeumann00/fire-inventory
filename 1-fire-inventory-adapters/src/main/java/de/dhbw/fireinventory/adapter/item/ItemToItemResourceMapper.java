@@ -14,6 +14,6 @@ public class ItemToItemResourceMapper implements Function<Item, ItemResource> {
     }
 
     private ItemResource map(final Item item) {
-        return new ItemResource(item.getDesignation(), item.getVehicle(), item.getEquipment());
+        return new ItemResource(item.getDesignation(), item.getLocation());
     }
 }

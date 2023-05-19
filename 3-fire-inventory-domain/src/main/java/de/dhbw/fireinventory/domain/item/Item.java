@@ -1,59 +1,37 @@
 package de.dhbw.fireinventory.domain.item;
 
 import de.dhbw.fireinventory.domain.AbstractEntity;
-import de.dhbw.fireinventory.domain.equipment.Equipment;
-import de.dhbw.fireinventory.domain.vehicle.Vehicle;
+import de.dhbw.fireinventory.domain.status.Status;
+import de.dhbw.fireinventory.domain.location.Location;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "item")
-public class Item extends AbstractEntity {
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+public abstract class Item extends AbstractEntity {
 
-    @ManyToOne()
-    @JoinColumn(name = "equipment_id", referencedColumnName = "id", nullable = true)
-    private Equipment equipment;
+    @ManyToOne
+    @NotNull
+    @JoinColumn(name = "location_id", referencedColumnName = "id")
+    private Location location;
 
-    @ManyToOne()
-    @JoinColumn(name = "vehicle_id", referencedColumnName = "id", nullable = true)
-    private Vehicle vehicle;
+    @NotNull
+    private Status status;
 
-
-    public Equipment getEquipment() {
-        return equipment;
+    public Location getLocation() {
+        return this.location;
     }
 
-    public void setEquipment(Equipment equipment) {
-        this.equipment = equipment;
+    public Status getStatus() {
+        return this.status;
     }
 
-    public Vehicle getVehicle() {
-        return vehicle;
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
-    public void setVehicle(Vehicle vehicle) {
-        this.vehicle = vehicle;
-    }
-
-    public String getDesignation()
-    {
-        if(this.getEquipment() == null)
-        {
-            if(this.getVehicle() == null)
-            {
-                return "";
-            }
-            else
-            {
-                return this.getVehicle().getDesignation();
-            }
-        }
-        else
-        {
-            return this.getEquipment().getDesignation();
-        }
+    public void setLocation(Location location) {
+        this.location = location;
     }
 }

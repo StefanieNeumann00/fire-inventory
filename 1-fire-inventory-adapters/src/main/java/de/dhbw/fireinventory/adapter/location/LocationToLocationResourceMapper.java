@@ -16,7 +16,7 @@ public class LocationToLocationResourceMapper implements Function<Location, Loca
     }
 
     private LocationResource map(final Location location) {
-        return new LocationResource(location.getDesignation(), location.getVehicle(), location.getPlace());
+        return new LocationResource(location.getDesignation());
     }
 
 }

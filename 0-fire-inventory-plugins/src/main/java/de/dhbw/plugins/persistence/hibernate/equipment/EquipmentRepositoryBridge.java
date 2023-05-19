@@ -1,9 +1,9 @@
 package de.dhbw.plugins.persistence.hibernate.equipment;
 
+import de.dhbw.fireinventory.domain.status.Status;
 import de.dhbw.fireinventory.domain.equipment.Equipment;
 import de.dhbw.fireinventory.domain.equipment.EquipmentRepository;
 import de.dhbw.fireinventory.domain.location.Location;
-import de.dhbw.fireinventory.domain.status.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -38,7 +38,7 @@ public class EquipmentRepositoryBridge implements EquipmentRepository {
         this.springDataEquipmentRepository.delete(equipment);
     }
 
-    public int equipmentStatusCount(String status) { return this.springDataEquipmentRepository.equipmentStatusCount(status);}
+    public int equipmentStatusCount(Status status) { return this.springDataEquipmentRepository.equipmentStatusCount(status);}
 
     @Override
     public List<Equipment> findAllByLocation(Location location) {

@@ -1,19 +1,28 @@
 package de.dhbw.fireinventory.domain.item;
 
-import de.dhbw.fireinventory.domain.equipment.Equipment;
-import de.dhbw.fireinventory.domain.vehicle.Vehicle;
+import de.dhbw.fireinventory.domain.status.Status;
+import de.dhbw.fireinventory.domain.location.Location;
 
 import java.util.List;
 
 public interface ItemRepository {
+    List<Item> findAll();
 
-    List<Item> findAllItems();
+    List<Item> findAllBy(String designation);
 
-    Item save(Item item);
+    List<Item> findAllByLocation(Location location);
 
-    Item getItemForVehicle(Vehicle vehicle);
+    List<Item> findAllByLocationAndDesignation(Location location, String designation);
 
-    Item getItemForEquipment(Equipment equipment);
+    List<Item> findAllByLocationAndStatus(Location location, Status status);
 
-    void deleteItem(Item item);
+    List<Item> findAllByLocationStatusAndDesignation(Location location, Status status, String designation);
+
+    List<Item> findAllByStatus(Status status);
+
+    List<Item> findAllByStatusAndDesignation(Status status, String designation);
+
+    void save(Item item);
+
+    void delete(Item item);
 }

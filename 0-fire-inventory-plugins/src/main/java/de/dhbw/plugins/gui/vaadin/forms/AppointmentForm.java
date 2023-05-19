@@ -55,9 +55,7 @@ public class AppointmentForm extends FormLayout {
         binder.readBean(appointment);
     }
 
-    public void setDate(Date date) { this.dueDatePicker.setValue(date.toInstant()
-            .atZone(ZoneId.systemDefault())
-            .toLocalDate()); }
+    public void setDate(LocalDate date) { this.dueDatePicker.setValue(date); }
 
     protected void configureForm() {
         appointmentDesignation = new TextField("Appointment Designation");

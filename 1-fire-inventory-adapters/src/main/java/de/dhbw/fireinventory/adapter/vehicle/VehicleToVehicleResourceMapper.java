@@ -16,7 +16,7 @@ public class VehicleToVehicleResourceMapper implements Function<Vehicle, Vehicle
     }
 
     private VehicleResource map(final Vehicle vehicle) {
-        return new VehicleResource(vehicle.getDesignation(), vehicle.getStatus(), vehicle.getPlace());
+        return new VehicleResource(vehicle.getDesignation(), vehicle.getStatus(), vehicle.getLocation());
     }
 
 }

@@ -1,7 +1,5 @@
 package de.dhbw.plugins.gui.vaadin.tabs;
 
-import com.vaadin.flow.component.ComponentEvent;
-import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.icon.Icon;
@@ -11,23 +9,17 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.flow.shared.Registration;
-import de.dhbw.fireinventory.application.appointment.AppointmentApplicationService;
 import de.dhbw.fireinventory.application.equipment.EquipmentApplicationService;
 import de.dhbw.fireinventory.application.item.ItemApplicationService;
 import de.dhbw.fireinventory.application.location.LocationApplicationService;
-import de.dhbw.fireinventory.application.status.StatusApplicationService;
-import de.dhbw.fireinventory.domain.appointment.Appointment;
+import de.dhbw.fireinventory.domain.Condition;
+import de.dhbw.fireinventory.domain.status.Status;
 import de.dhbw.fireinventory.domain.equipment.Equipment;
 import de.dhbw.fireinventory.domain.location.Location;
-import de.dhbw.fireinventory.domain.status.Status;
 import de.dhbw.plugins.gui.vaadin.components.EquipmentGrid;
 import de.dhbw.plugins.gui.vaadin.components.ErrorMessage;
 import de.dhbw.plugins.gui.vaadin.forms.*;
 import org.springframework.dao.DataIntegrityViolationException;
-
-import java.time.ZoneId;
-import java.util.Date;
 
 public class EquipmentTabLayout extends AbstractTabLayout {
     EquipmentGrid grid;
@@ -36,18 +28,16 @@ public class EquipmentTabLayout extends AbstractTabLayout {
     EquipmentForm equipmentForm;
     EquipmentApplicationService equipmentService;
     LocationApplicationService locationService;
-    StatusApplicationService statusService;
     ItemApplicationService itemService;
     ComboBox<Location> locationComboBox;
     ComboBox<Status> statusComboBox;
 
-    public EquipmentTabLayout(EquipmentApplicationService equipmentService, LocationApplicationService locationService, StatusApplicationService statusService, ItemApplicationService itemService)
+    public EquipmentTabLayout(EquipmentApplicationService equipmentService, LocationApplicationService locationService, ItemApplicationService itemService)
     {
         super();
 
         this.equipmentService = equipmentService;
         this.locationService = locationService;
-        this.statusService = statusService;
         this.itemService = itemService;
 
         configureGrid();
@@ -71,7 +61,7 @@ public class EquipmentTabLayout extends AbstractTabLayout {
     }
 
     private void configureEquipmentForm() {
-        equipmentForm = new EquipmentForm(locationService.findAllLocations());
+        equipmentForm = new EquipmentForm(locationService.findAllLocations(null));
         equipmentForm.setWidth("25em");
         equipmentForm.addListener(EquipmentForm.SaveEvent.class, this::saveEquipment);
         equipmentForm.addListener(EquipmentForm.DeleteEvent.class, this::deleteEquipment);
@@ -98,13 +88,13 @@ public class EquipmentTabLayout extends AbstractTabLayout {
         Button addEquipmentButton = new Button("Add Equipment");
 
         locationComboBox = new ComboBox<>("Location");
-        locationComboBox.setItems(locationService.findAllLocations());
+        locationComboBox.setItems(locationService.findAllLocations(null));
         locationComboBox.setItemLabelGenerator(Location::getDesignation);
         locationComboBox.setClearButtonVisible(true);
         locationComboBox.addValueChangeListener(e -> updateList());
 
         statusComboBox = new ComboBox<>("Status");
-        statusComboBox.setItems(statusService.findAllStatuses());
+        statusComboBox.setItems(Status.values());
         statusComboBox.setItemLabelGenerator(Status::getDesignation);
         statusComboBox.setClearButtonVisible(true);
         statusComboBox.addValueChangeListener(e -> updateList());
@@ -155,8 +145,8 @@ public class EquipmentTabLayout extends AbstractTabLayout {
 
     private void saveEquipment(EquipmentForm.SaveEvent event) {
         Equipment equipment = event.getEquipment();
-        equipment = setEquipmentStatus(equipment);
-        equipmentService.saveEquipment(equipment);
+        Condition conditionValue = equipmentForm.getConditionRadioButtonValue();
+        equipmentService.saveEquipment(equipment, conditionValue);
         updateList();
         closeEquipmentEditor();
         fireEvent(new GridUpdatedEvent(this));
@@ -165,7 +155,6 @@ public class EquipmentTabLayout extends AbstractTabLayout {
     private void deleteEquipment(EquipmentForm.DeleteEvent event) {
         try {
             Equipment equipment = event.getEquipment();
-            itemService.deleteItem(equipment);
             equipmentService.deleteEquipment(equipment);
             updateList();
             closeEquipmentEditor();
@@ -174,52 +163,5 @@ public class EquipmentTabLayout extends AbstractTabLayout {
         catch (DataIntegrityViolationException exception) {
             new ErrorMessage("You cannot delete this vehicle since there are still equipments attached.");
         }
-    }
-
-    private Equipment setEquipmentStatus(Equipment equipment)
-    {
-        String conditionValue = equipmentForm.getConditionRadioButtonValue();
-        Location location = equipment.getLocation();
-        Status status = statusService.getStatusByDesignation("Nicht vor Ort");
-
-        if(conditionValue == "funktionsfähig")
-        {
-            if(location.getVehicle() != null) {
-                String vehicleStatusDesignation = location.getVehicle().getStatus().getDesignation();
-
-                switch (vehicleStatusDesignation) {
-                    case "Einsatzbereit":
-                        status = statusService.getStatusByDesignation("Einsatzbereit");
-                        break;
-                    case "Kaputt":
-                        status = statusService.getStatusByDesignation("Vor Ort");
-                        break;
-                }
-            }
-            else if(location.getPlace() != null) {
-                String placeDesignation = location.getPlace().getDesignation();
-
-                if(placeDesignation != "Abwesend")
-                {
-                    status = statusService.getStatusByDesignation("Vor Ort");
-                }
-            }
-        }
-        else
-        {
-            status = statusService.getStatusByDesignation("Kaputt");
-
-            if(location.getVehicle() != null) {
-                String vehicleStatusDesignation = location.getVehicle().getStatus().getDesignation();
-
-                if(vehicleStatusDesignation == "In Reparatur")
-                {
-                    status = statusService.getStatusByDesignation("In Reparatur");
-                }
-            }
-        }
-
-        equipment.setStatus(status);
-        return equipment;
     }
 }

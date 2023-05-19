@@ -12,11 +12,10 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import de.dhbw.fireinventory.application.appointment.AppointmentApplicationService;
 import de.dhbw.fireinventory.application.item.ItemApplicationService;
 import de.dhbw.fireinventory.application.location.LocationApplicationService;
-import de.dhbw.fireinventory.application.place.PlaceApplicationService;
-import de.dhbw.fireinventory.application.status.StatusApplicationService;
 import de.dhbw.fireinventory.application.vehicle.VehicleApplicationService;
-import de.dhbw.fireinventory.domain.place.Place;
+import de.dhbw.fireinventory.domain.Condition;
 import de.dhbw.fireinventory.domain.status.Status;
+import de.dhbw.fireinventory.domain.location.Location;
 import de.dhbw.fireinventory.domain.vehicle.Vehicle;
 import de.dhbw.plugins.gui.vaadin.components.ErrorMessage;
 import de.dhbw.plugins.gui.vaadin.components.VehicleGrid;
@@ -30,22 +29,18 @@ public class VehicleTabLayout extends AbstractTabLayout{
     HorizontalLayout filterLayout;
     VehicleForm vehicleForm;
     LocationApplicationService locationService;
-    PlaceApplicationService placeService;
-    StatusApplicationService statusService;
     VehicleApplicationService vehicleService;
     AppointmentApplicationService appointmentService;
     ItemApplicationService itemService;
-    ComboBox<Place> placeComboBox;
+    ComboBox<Location> locationComboBox;
     ComboBox<Status> statusComboBox;
 
-    public VehicleTabLayout(LocationApplicationService locationService, ItemApplicationService itemService, PlaceApplicationService placeService, StatusApplicationService statusService, VehicleApplicationService vehicleService, AppointmentApplicationService appointmentService)
+    public VehicleTabLayout(LocationApplicationService locationService, ItemApplicationService itemService, VehicleApplicationService vehicleService, AppointmentApplicationService appointmentService)
     {
         super();
 
         this.itemService = itemService;
         this.locationService = locationService;
-        this.placeService = placeService;
-        this.statusService = statusService;
         this.vehicleService = vehicleService;
         this.appointmentService = appointmentService;
 
@@ -70,7 +65,7 @@ public class VehicleTabLayout extends AbstractTabLayout{
     }
 
     private void configureVehicleForm() {
-        vehicleForm = new VehicleForm(placeService.findAllBy(null));
+        vehicleForm = new VehicleForm(locationService.findAllPlaces(null));
         vehicleForm.setWidth("25em");
         vehicleForm.addListener(VehicleForm.SaveEvent.class, this::saveVehicle);
         vehicleForm.addListener(VehicleForm.DeleteEvent.class, this::deleteVehicle);
@@ -94,14 +89,14 @@ public class VehicleTabLayout extends AbstractTabLayout{
 
         Button addVehicleButton = new Button("Add Vehicle");
 
-        placeComboBox = new ComboBox<>("Place");
-        placeComboBox.setItems(placeService.findAllBy(null));
-        placeComboBox.setItemLabelGenerator(Place::getDesignation);
-        placeComboBox.setClearButtonVisible(true);
-        placeComboBox.addValueChangeListener(e -> updateList());
+        locationComboBox = new ComboBox<>("Place");
+        locationComboBox.setItems(locationService.findAllPlaces(null));
+        locationComboBox.setItemLabelGenerator(Location::getDesignation);
+        locationComboBox.setClearButtonVisible(true);
+        locationComboBox.addValueChangeListener(e -> updateList());
 
         statusComboBox = new ComboBox<>("Status");
-        statusComboBox.setItems(statusService.findAllStatuses());
+        statusComboBox.setItems(Status.values());
         statusComboBox.setItemLabelGenerator(Status::getDesignation);
         statusComboBox.setClearButtonVisible(true);
         statusComboBox.addValueChangeListener(e -> updateList());
@@ -110,7 +105,7 @@ public class VehicleTabLayout extends AbstractTabLayout{
 
         HorizontalLayout buttonsLayout = new HorizontalLayout(filterIcon, addVehicleButton);
         buttonsLayout.setAlignItems(FlexComponent.Alignment.CENTER);
-        filterLayout = new HorizontalLayout(placeComboBox, statusComboBox, filterText);
+        filterLayout = new HorizontalLayout(locationComboBox, statusComboBox, filterText);
         filterLayout.setVisible(false);
 
         VerticalLayout toolbar = new VerticalLayout(buttonsLayout, filterLayout);
@@ -129,8 +124,6 @@ public class VehicleTabLayout extends AbstractTabLayout{
 
     private void deleteVehicle(VehicleForm.DeleteEvent event) {
         try {
-            locationService.deleteLocation(event.getVehicle());
-            itemService.deleteItem(event.getVehicle());
             vehicleService.deleteVehicle(event.getVehicle());
             updateList();
             closeVehicleEditor();
@@ -164,50 +157,16 @@ public class VehicleTabLayout extends AbstractTabLayout{
     }
 
     private void updateList() {
-        grid.updateList(placeComboBox.getValue(), statusComboBox.getValue(), filterText.getValue());
+        grid.updateList(locationComboBox.getValue(), statusComboBox.getValue(), filterText.getValue());
     }
 
     private void saveVehicle(VehicleForm.SaveEvent event) {
         Vehicle vehicle = event.getVehicle();
-        vehicle = setVehicleStatus(vehicle);
-        vehicleService.saveVehicle(vehicle);
+        Condition conditionValue = vehicleForm.getConditionRadioButtonValue();
+        vehicleService.saveVehicle(vehicle, conditionValue);
         updateList();
         closeVehicleEditor();
         fireEvent(new GridUpdatedEvent(this));
-    }
-
-    private Vehicle setVehicleStatus(Vehicle vehicle)
-    {
-        String conditionValue = vehicleForm.getConditionRadioButtonValue();
-        Place place = vehicle.getPlace();
-        Status status = statusService.getStatusByDesignation("Einsatzbereit");
-        String placeDesignation = "";
-
-        if(place != null) {
-            placeDesignation = place.getDesignation();
-        }
-
-        if(conditionValue == "funktionsfähig")
-        {
-            if(placeDesignation == "Abwesend")
-            {
-                status = statusService.getStatusByDesignation("Nicht vor Ort");
-            }
-        }
-        else
-        {
-            if(placeDesignation == "Abwesend")
-            {
-                status = statusService.getStatusByDesignation("In Reparatur");
-            }
-            else
-            {
-                status = statusService.getStatusByDesignation("Kaputt");
-            }
-        }
-
-        vehicle.setStatus(status);
-        return vehicle;
     }
 
 }

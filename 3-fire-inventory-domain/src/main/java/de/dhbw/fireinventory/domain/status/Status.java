@@ -1,33 +1,30 @@
 package de.dhbw.fireinventory.domain.status;
 
-import de.dhbw.fireinventory.domain.AbstractEntity;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+public enum Status {
+    EINSATZBEREIT("einsatzbereit"),
+    VOR_ORT("vor Ort"),
+    NICHT_VOR_ORT("nicht vor Ort"),
+    IN_REPARATUR("in Reparatur"),
+    KAPUTT("kaputt");
 
-@Entity
-@Table(name = "status")
-public class Status extends AbstractEntity {
-
-    @NotNull
-    @NotEmpty
     private String designation;
 
-    public Status() {
-
+    private Status(String status){
+        this.designation = status;
     }
 
-    public Status(String name) {
-        this.designation = name;
-    }
-
-    public String getDesignation() {
+    public String getDesignation(){
         return designation;
     }
 
-    public void setDesignation(String name) {
-        this.designation = name;
+    public static List<String> getAll(){
+        List<String> statuses = new ArrayList<>();
+        for (Status status: values()) {
+            statuses.add(status.getDesignation());
+        }
+        return statuses;
     }
 }

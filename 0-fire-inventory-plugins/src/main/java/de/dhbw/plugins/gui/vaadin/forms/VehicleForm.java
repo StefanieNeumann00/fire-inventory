@@ -15,30 +15,31 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.shared.Registration;
-import de.dhbw.fireinventory.domain.place.Place;
+import de.dhbw.fireinventory.domain.Condition;
+import de.dhbw.fireinventory.domain.location.Location;
 import de.dhbw.fireinventory.domain.vehicle.Vehicle;
 
 import java.util.List;
 
 public class VehicleForm extends FormLayout {
     TextField designationTextField = new TextField("Designation");
-    ComboBox<Place> placeComboBox = new ComboBox<>("Place");
-    RadioButtonGroup<String> conditionRadioGroup = new RadioButtonGroup<>();
+    ComboBox<Location> locationComboBox = new ComboBox<>("Location");
+    RadioButtonGroup<Condition> conditionRadioGroup = new RadioButtonGroup<>();
     Button save = new Button("Save");
     Button delete = new Button("delete");
     Button close = new Button("Cancel");
     Binder<Vehicle> binder = new BeanValidationBinder<>(Vehicle.class);
     private Vehicle vehicle = new Vehicle();
 
-    public VehicleForm(List<Place> places) {
-        placeComboBox.setItems(places);
-        placeComboBox.setItemLabelGenerator(Place::getDesignation);
+    public VehicleForm(List<Location> locations) {
+        locationComboBox.setItems(locations);
+        locationComboBox.setItemLabelGenerator(Location::getDesignation);
         createConditionRadioButton();
 
         this.createConditionRadioButton();
-        add(designationTextField, placeComboBox, conditionRadioGroup,createButtonsLayout());
+        add(designationTextField, locationComboBox, conditionRadioGroup,createButtonsLayout());
         binder.bind(designationTextField, "designation");
-        binder.bind(placeComboBox, "place");
+        binder.bind(locationComboBox, "place");
         binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
     }
 
@@ -46,8 +47,8 @@ public class VehicleForm extends FormLayout {
     {
         conditionRadioGroup.addThemeVariants(RadioGroupVariant.LUMO_VERTICAL);
         conditionRadioGroup.setLabel("Zustand");
-        conditionRadioGroup.setItems("funktionsfähig", "nicht funktionsfähig");
-        conditionRadioGroup.setValue("funktionsfähig");
+        conditionRadioGroup.setItems(Condition.values());
+        conditionRadioGroup.setValue(Condition.FUNKTIONSFÄHIG);
     }
 
     public void setVehicle(Vehicle vehicle) {
@@ -79,7 +80,7 @@ public class VehicleForm extends FormLayout {
         }
     }
 
-    public String getConditionRadioButtonValue()
+    public Condition getConditionRadioButtonValue()
     {
         return conditionRadioGroup.getValue();
     }

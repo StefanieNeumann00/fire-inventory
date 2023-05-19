@@ -4,6 +4,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @MappedSuperclass
@@ -13,12 +15,24 @@ public abstract class AbstractEntity {
     @GeneratedValue(strategy=GenerationType.AUTO)
     private UUID id;
 
+    @NotNull
+    @NotEmpty
+    private String designation = "";
+
     public UUID getId() {
         return id;
     }
 
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    public String getDesignation() {
+        return designation;
+    }
+
+    public void setDesignation(String designation) {
+        this.designation = designation;
     }
 
     @Override

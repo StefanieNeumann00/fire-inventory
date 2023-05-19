@@ -1,7 +1,7 @@
 package de.dhbw.fireinventory.adapter.equipment;
 
-import de.dhbw.fireinventory.domain.location.Location;
 import de.dhbw.fireinventory.domain.status.Status;
+import de.dhbw.fireinventory.domain.location.Location;
 
 public class EquipmentResource {
 

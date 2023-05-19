@@ -17,6 +17,7 @@ import com.vaadin.flow.dom.ElementFactory;
 import com.vaadin.flow.shared.Registration;
 import de.dhbw.fireinventory.domain.appointment.Appointment;
 import de.dhbw.fireinventory.domain.item.Item;
+import de.dhbw.fireinventory.domain.vehicle.Vehicle;
 
 import java.util.List;
 
@@ -58,7 +59,7 @@ public class ListViewForm extends FormLayout {
             });
 
     private Icon getIcon(Item item) {
-        if (item.getVehicle() != null) {
+        if (item instanceof Vehicle) {
             return new Icon(VaadinIcon.TRUCK);
         } else {
             return new Icon(VaadinIcon.HAMMER);

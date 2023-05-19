@@ -4,16 +4,14 @@ import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.shared.Registration;
 import de.dhbw.fireinventory.application.equipment.EquipmentApplicationService;
+import de.dhbw.fireinventory.domain.status.Status;
 import de.dhbw.fireinventory.domain.equipment.Equipment;
 import de.dhbw.fireinventory.domain.location.Location;
-import de.dhbw.fireinventory.domain.status.Status;
 
 public class EquipmentGrid extends AbstractGrid<Equipment> {
 

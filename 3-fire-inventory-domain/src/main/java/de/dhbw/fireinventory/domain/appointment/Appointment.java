@@ -4,7 +4,6 @@ import de.dhbw.fireinventory.domain.AbstractEntity;
 import de.dhbw.fireinventory.domain.item.Item;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
@@ -12,24 +11,13 @@ import java.time.LocalDate;
 @Table(name = "appointment")
 public class Appointment extends AbstractEntity {
 
-    @NotNull
-    @NotEmpty
-    private String designation = "";
-
     @ManyToOne
+    @NotNull
     @JoinColumn(name = "item_id", referencedColumnName = "id")
     private Item item;
 
     @NotNull
     private LocalDate dueDate;
-
-    public String getDesignation() {
-        return designation;
-    }
-
-    public void setDesignation(String designation) {
-        this.designation = designation;
-    }
 
     public Item getItem() {
         return item;

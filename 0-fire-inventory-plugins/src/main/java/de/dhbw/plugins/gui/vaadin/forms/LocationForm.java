@@ -12,25 +12,26 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.shared.Registration;
-import de.dhbw.fireinventory.domain.place.Place;
+import de.dhbw.fireinventory.domain.location.InternalPlace;
+import de.dhbw.fireinventory.domain.location.Location;
 
-public class PlaceForm extends FormLayout {
+public class LocationForm extends FormLayout {
     TextField designation = new TextField("Designation");
     Button save = new Button("Save");
     Button delete = new Button("delete");
     Button close = new Button("Cancel");
-    Binder<Place> binder = new BeanValidationBinder<>(Place.class);
-    private Place place = new Place();
+    Binder<Location> binder = new BeanValidationBinder<>(Location.class);
+    private Location location = new InternalPlace();
 
-    public PlaceForm() {
+    public LocationForm() {
         this.add(designation,createButtonsLayout());
         binder.bindInstanceFields(this);
         binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
     }
 
-    public void setPlace(Place place) {
-        this.place = place;
-        binder.readBean(place);
+    public void setLocation(Location location) {
+        this.location = location;
+        binder.readBean(location);
     }
 
     private HorizontalLayout createButtonsLayout() {
@@ -42,7 +43,7 @@ public class PlaceForm extends FormLayout {
         close.addClickShortcut(Key.ESCAPE);
 
         save.addClickListener(event -> validateAndSave());
-        delete.addClickListener(event -> fireEvent(new DeleteEvent(this, place)));
+        delete.addClickListener(event -> fireEvent(new DeleteEvent(this, location)));
         close.addClickListener(event -> fireEvent(new CloseEvent(this)));
 
         return new HorizontalLayout(save, delete,  close);
@@ -50,41 +51,41 @@ public class PlaceForm extends FormLayout {
 
     public void validateAndSave() {
         try {
-            binder.writeBean(place);
-            fireEvent(new PlaceForm.SaveEvent(this, place));
+            binder.writeBean(location);
+            fireEvent(new LocationForm.SaveEvent(this, location));
         } catch (ValidationException e) {
             e.printStackTrace();
         }
     }
 
-    public static abstract class PlaceFormEvent extends ComponentEvent<PlaceForm> {
-        private Place place;
+    public static abstract class LocationFormEvent extends ComponentEvent<LocationForm> {
+        private Location location;
 
-        protected PlaceFormEvent(PlaceForm source, Place place) {
+        protected LocationFormEvent(LocationForm source, Location location) {
             super(source, false);
-            this.place = place;
+            this.location = location;
         }
 
-        public Place getPlace() {
-            return place;
-        }
-    }
-
-    public static class SaveEvent extends PlaceFormEvent {
-        SaveEvent(PlaceForm source, Place place) {
-            super(source, place);
+        public Location getLocation() {
+            return location;
         }
     }
 
-    public static class DeleteEvent extends PlaceFormEvent {
-        DeleteEvent(PlaceForm source, Place place) {
-            super(source, place);
+    public static class SaveEvent extends LocationFormEvent {
+        SaveEvent(LocationForm source, Location location) {
+            super(source, location);
+        }
+    }
+
+    public static class DeleteEvent extends LocationFormEvent {
+        DeleteEvent(LocationForm source, Location location) {
+            super(source, location);
         }
 
     }
 
-    public static class CloseEvent extends PlaceFormEvent {
-        CloseEvent(PlaceForm source) {
+    public static class CloseEvent extends LocationFormEvent {
+        CloseEvent(LocationForm source) {
             super(source, null);
         }
     }
