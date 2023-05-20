@@ -1,4 +1,4 @@
-package de.dhbw.fireinventory.domain;
+package de.dhbw.fireinventory.domain.condition;
 
 import java.util.ArrayList;
 import java.util.List;

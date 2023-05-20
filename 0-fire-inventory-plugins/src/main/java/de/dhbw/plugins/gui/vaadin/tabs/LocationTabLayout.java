@@ -35,6 +35,7 @@ public class LocationTabLayout extends AbstractTabLayout{
 
         add(getToolbar(), getContent());
         closePlaceEditor();
+        updateList();
     }
 
     private void configurePlaceForm() {

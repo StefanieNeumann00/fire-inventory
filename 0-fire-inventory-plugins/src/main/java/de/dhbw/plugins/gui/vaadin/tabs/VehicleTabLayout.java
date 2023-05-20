@@ -13,13 +13,16 @@ import de.dhbw.fireinventory.application.appointment.AppointmentApplicationServi
 import de.dhbw.fireinventory.application.item.ItemApplicationService;
 import de.dhbw.fireinventory.application.location.LocationApplicationService;
 import de.dhbw.fireinventory.application.vehicle.VehicleApplicationService;
-import de.dhbw.fireinventory.domain.Condition;
+import de.dhbw.fireinventory.domain.appointment.Appointment;
+import de.dhbw.fireinventory.domain.condition.Condition;
+import de.dhbw.fireinventory.domain.equipment.Equipment;
 import de.dhbw.fireinventory.domain.status.Status;
 import de.dhbw.fireinventory.domain.location.Location;
 import de.dhbw.fireinventory.domain.vehicle.Vehicle;
 import de.dhbw.plugins.gui.vaadin.components.ErrorMessage;
 import de.dhbw.plugins.gui.vaadin.components.VehicleGrid;
 import de.dhbw.plugins.gui.vaadin.forms.*;
+import de.dhbw.plugins.gui.vaadin.routes.Calendar;
 import org.springframework.dao.DataIntegrityViolationException;
 
 public class VehicleTabLayout extends AbstractTabLayout{
@@ -49,6 +52,7 @@ public class VehicleTabLayout extends AbstractTabLayout{
 
         add(getToolbar(), getContent());
         closeVehicleEditor();
+        updateList();
     }
 
     private HorizontalLayout getContent() {
@@ -76,6 +80,12 @@ public class VehicleTabLayout extends AbstractTabLayout{
         grid = new VehicleGrid(vehicleService);
         grid.addListener(VehicleGrid.AddAppointmentEvent.class, e -> addAppointment(e.getVehicle()));
         grid.addListener(VehicleGrid.EditVehicleEvent.class, e -> editVehicle(e.getVehicle()));
+        grid.addListener(VehicleGrid.VehicleConditionChangedEvent.class, e -> changeCondition(e.getVehicle()));
+    }
+
+    private void changeCondition(Vehicle vehicle) {
+        vehicleService.changeCondition(vehicle);
+        updateList();
     }
 
     private VerticalLayout getToolbar() {
@@ -113,7 +123,11 @@ public class VehicleTabLayout extends AbstractTabLayout{
         return toolbar;
     }
 
-    private void addAppointment(Vehicle vehicle) {}
+    private void addAppointment(Vehicle vehicle) {
+        Appointment appointment = new Appointment();
+        appointment.setItem(vehicle);
+        this.getUI().ifPresent(ui -> ui.navigate(Calendar.class).ifPresent(calendar -> calendar.editAppointment(appointment)));
+    }
 
     private void changeFilterVisibility() {
         if(filterLayout.isVisible()) { filterLayout.setVisible(false); }

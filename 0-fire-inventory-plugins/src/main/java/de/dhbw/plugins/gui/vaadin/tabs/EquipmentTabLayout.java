@@ -12,13 +12,15 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import de.dhbw.fireinventory.application.equipment.EquipmentApplicationService;
 import de.dhbw.fireinventory.application.item.ItemApplicationService;
 import de.dhbw.fireinventory.application.location.LocationApplicationService;
-import de.dhbw.fireinventory.domain.Condition;
+import de.dhbw.fireinventory.domain.appointment.Appointment;
+import de.dhbw.fireinventory.domain.condition.Condition;
 import de.dhbw.fireinventory.domain.status.Status;
 import de.dhbw.fireinventory.domain.equipment.Equipment;
 import de.dhbw.fireinventory.domain.location.Location;
 import de.dhbw.plugins.gui.vaadin.components.EquipmentGrid;
 import de.dhbw.plugins.gui.vaadin.components.ErrorMessage;
 import de.dhbw.plugins.gui.vaadin.forms.*;
+import de.dhbw.plugins.gui.vaadin.routes.Calendar;
 import org.springframework.dao.DataIntegrityViolationException;
 
 public class EquipmentTabLayout extends AbstractTabLayout {
@@ -45,6 +47,7 @@ public class EquipmentTabLayout extends AbstractTabLayout {
 
         add(getToolbar(), getContent());
         closeEquipmentEditor();
+        updateList();
     }
 
     private HorizontalLayout getContent() {
@@ -72,9 +75,19 @@ public class EquipmentTabLayout extends AbstractTabLayout {
         grid = new EquipmentGrid(equipmentService);
         grid.addListener(EquipmentGrid.AddAppointmentEvent.class, e -> addAppointment(e.getEquipment()));
         grid.addListener(EquipmentGrid.EditEquipmentEvent.class, e -> editEquipment(e.getEquipment()));
+        grid.addListener(EquipmentGrid.EquipmentConditionChangedEvent.class, e -> changeCondition(e.getEquipment()));
     }
 
-    private void addAppointment(Equipment equipment) {}
+    private void addAppointment(Equipment equipment) {
+        Appointment appointment = new Appointment();
+        appointment.setItem(equipment);
+        this.getUI().ifPresent(ui -> ui.navigate(Calendar.class).ifPresent(calendar -> calendar.editAppointment(appointment)));
+    }
+
+    private void changeCondition(Equipment equipment) {
+        equipmentService.changeCondition(equipment);
+        updateList();
+    }
 
     private VerticalLayout getToolbar() {
         filterText.setPlaceholder("...");
@@ -111,7 +124,7 @@ public class EquipmentTabLayout extends AbstractTabLayout {
         return toolbar;
     }
 
-    private void changeFilterVisibility() {
+    public void changeFilterVisibility() {
         if(filterLayout.isVisible()) { filterLayout.setVisible(false); }
         else { filterLayout.setVisible(true); }
     }
@@ -145,8 +158,7 @@ public class EquipmentTabLayout extends AbstractTabLayout {
 
     private void saveEquipment(EquipmentForm.SaveEvent event) {
         Equipment equipment = event.getEquipment();
-        Condition conditionValue = equipmentForm.getConditionRadioButtonValue();
-        equipmentService.saveEquipment(equipment, conditionValue);
+        equipmentService.saveEquipment(equipment);
         updateList();
         closeEquipmentEditor();
         fireEvent(new GridUpdatedEvent(this));

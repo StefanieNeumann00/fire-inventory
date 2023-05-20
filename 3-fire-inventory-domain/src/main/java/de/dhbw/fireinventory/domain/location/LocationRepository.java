@@ -1,5 +1,7 @@
 package de.dhbw.fireinventory.domain.location;
 
+import de.dhbw.fireinventory.domain.vehicle.Vehicle;
+
 import java.util.List;
 
 public interface LocationRepository {
@@ -8,5 +10,9 @@ public interface LocationRepository {
 
     void delete(Location location);
 
-    List<Location> findAll(String filterText);
+    List<Location> findAllBy(String filterText);
+
+    List<Location> findAll();
+
+    VehiclePlace findLocationForVehicle(Vehicle vehicle);
 }

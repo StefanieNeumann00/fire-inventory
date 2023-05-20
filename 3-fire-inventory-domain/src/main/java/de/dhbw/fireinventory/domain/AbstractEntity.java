@@ -17,7 +17,7 @@ public abstract class AbstractEntity {
 
     @NotNull
     @NotEmpty
-    private String designation = "";
+    private String designation;
 
     public UUID getId() {
         return id;

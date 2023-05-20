@@ -40,26 +40,6 @@ public class ItemRepositoryBridge implements ItemRepository {
     }
 
     @Override
-    public List<Item> findAllByLocationAndStatus(Location location, Status status) {
-        return this.springDataItemRepository.findAllByLocationAndStatus(location, status);
-    }
-
-    @Override
-    public List<Item> findAllByLocationStatusAndDesignation(Location location, Status status, String designation) {
-        return this.springDataItemRepository.findAllByLocationStatusAndDesignation(location, status, designation);
-    }
-
-    @Override
-    public List<Item> findAllByStatus(Status status) {
-        return this.springDataItemRepository.findAllByStatus(status);
-    }
-
-    @Override
-    public List<Item> findAllByStatusAndDesignation(Status status, String designation) {
-        return this.springDataItemRepository.findAllByStatusAndDesignation(status, designation);
-    }
-
-    @Override
     public void save(Item item) {
         this.springDataItemRepository.save(item);
     }

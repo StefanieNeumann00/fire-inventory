@@ -1,9 +1,7 @@
 package de.dhbw.fireinventory.application.location;
 
-import de.dhbw.fireinventory.domain.location.ExternalPlace;
-import de.dhbw.fireinventory.domain.location.InternalPlace;
-import de.dhbw.fireinventory.domain.location.Location;
-import de.dhbw.fireinventory.domain.location.LocationRepository;
+import de.dhbw.fireinventory.domain.location.*;
+import de.dhbw.fireinventory.domain.vehicle.Vehicle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +23,13 @@ public class LocationApplicationService {
         this.locationRepository.delete(location);
     }
 
-    public List<Location> findAllLocations(String filterText) { return this.locationRepository.findAll(filterText);}
+    public List<Location> findAllLocations(String filterText) {
+        if (filterText == null) {
+            return this.locationRepository.findAll();
+        } else {
+            return this.locationRepository.findAllBy(filterText);
+        }
+    }
 
     public List<Location> findAllPlaces(String filterText) {
         List<Location> allLocations = this.findAllLocations(filterText);
@@ -39,5 +43,4 @@ public class LocationApplicationService {
 
         return allPlaces;
     }
-
 }

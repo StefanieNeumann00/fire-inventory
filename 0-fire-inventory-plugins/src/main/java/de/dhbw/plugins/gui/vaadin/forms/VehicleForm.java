@@ -15,7 +15,7 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.shared.Registration;
-import de.dhbw.fireinventory.domain.Condition;
+import de.dhbw.fireinventory.domain.condition.Condition;
 import de.dhbw.fireinventory.domain.location.Location;
 import de.dhbw.fireinventory.domain.vehicle.Vehicle;
 
@@ -26,7 +26,7 @@ public class VehicleForm extends FormLayout {
     ComboBox<Location> locationComboBox = new ComboBox<>("Location");
     RadioButtonGroup<Condition> conditionRadioGroup = new RadioButtonGroup<>();
     Button save = new Button("Save");
-    Button delete = new Button("delete");
+    Button delete = new Button("Delete");
     Button close = new Button("Cancel");
     Binder<Vehicle> binder = new BeanValidationBinder<>(Vehicle.class);
     private Vehicle vehicle = new Vehicle();
@@ -39,7 +39,7 @@ public class VehicleForm extends FormLayout {
         this.createConditionRadioButton();
         add(designationTextField, locationComboBox, conditionRadioGroup,createButtonsLayout());
         binder.bind(designationTextField, "designation");
-        binder.bind(locationComboBox, "place");
+        binder.bind(locationComboBox, "location");
         binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
     }
 
