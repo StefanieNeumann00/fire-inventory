@@ -1,7 +1,6 @@
 package de.dhbw.fireinventory.application.location;
 
 import de.dhbw.fireinventory.domain.location.*;
-import de.dhbw.fireinventory.domain.vehicle.Vehicle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
