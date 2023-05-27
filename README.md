@@ -11,7 +11,7 @@ Ein integrierter Kalendar kann für die Eintragung von Wartungs- und Reparaturte
 4. [Start](#Start)
 5. [Projektstatus](#Projektstatus)
 
-## Einleitung <a name="Einleitung"></a>
+## Einleitung
 
 ### Detailierte Beschreibung
 Gerätschaften, Fahrzeuge und Räumlichkeiten für die Ablage dieser können individuell in der App angelegt werden.
@@ -29,21 +29,21 @@ errechneter Status zusätzlich Aufschluss über die Verfügbarkeit eines Fahrzeu
 <li>Termine: Termin anlegen, Termin ändern, Termine filtern
 </ul>
 
-## Architektur <a name="Architektur"></a>
+## Architektur
 Die Architektur des Fire Inventory Projekts orientiert sich an der Clean Architecture.
 Die Abstraction Code-Schicht enthält domänenübergreifende Grundbausteine. Die Domain Code-Schicht implementiert organisationsweit gültige Geschäftslogik. Die Application Code-Schicht enthält die Anwendungsfälle des FireInventory-Projekts.
 Die Adapter-Schicht vermittelt Aufrufe und Daten an die inneren Schichten. Die Plugin-Schicht bindet Adapter für die graphische Oberfläche und den Datenbankzugriff an.
 
 <img src="./images/Architektur.png" alt="Architektur">
 
-## Technologien <a name="Technologien"></a>
+## Technologien
 
 Spring Boot version: 2.7.9 <br>
 Vaadin version: 23.3.0 <br>
 Flyway DB version: 9.15.1 <br>
 PostgreSQL version: 42.5.4
 
-## Start <a name="Start"></a>
+## Start
 
 ### Build
 Im Hauptverzeichnis ist folgendes Kommando auszuführen:
@@ -82,6 +82,6 @@ mvn properties:read-project-properties flyway:clean flyway:migrate sql:execute
 ````
 oder über die RunConfiguration "seed db"
 
-## Projektstatus <a name="Projektstatus"></a>
+## Projektstatus
 Das FireInventory-Projekt befindet sich noch in der Entwicklung. Insbesondere die Kalendar-Funktion soll durch Terminerinnerungen und wiederkehrende Termine erweitert werden.
 Bisher ist die Anwendung lediglich über die graphische Oberfläche im Browser zugänglich. Zukünftig sollen weitere Schnittstellen (REST) zu Verfügung gestellt werden.
