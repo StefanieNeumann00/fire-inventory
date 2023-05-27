@@ -75,11 +75,6 @@ public class EquipmentForm extends FormLayout {
             return layout;
         }
 
-        public Condition getConditionRadioButtonValue()
-        {
-            return conditionRadioGroup.getValue();
-        }
-
         public void validateAndSave() {
             try {
                 binder.writeBean(equipment);
