@@ -84,4 +84,7 @@ oder über die RunConfiguration "seed db"
 
 ## Projektstatus
 Das FireInventory-Projekt befindet sich noch in der Entwicklung. Insbesondere die Kalendar-Funktion soll durch Terminerinnerungen und wiederkehrende Termine erweitert werden.
+Bisher können nur interne Räumlichkeiten angelegt werden - zukünftig sollen auch externe Räumlichkeiten angelegt werden können.
 Bisher ist die Anwendung lediglich über die graphische Oberfläche im Browser zugänglich. Zukünftig sollen weitere Schnittstellen (REST) zu Verfügung gestellt werden.
+
+Der letzte Commit (Stand 29.05.2023) enthält keine stabile Version des Projekts - es müssen noch Bugs gefixt werden.
