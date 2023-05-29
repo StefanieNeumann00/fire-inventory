@@ -15,31 +15,31 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.shared.Registration;
+import de.dhbw.fireinventory.application.domain.service.location.LocationResource;
+import de.dhbw.fireinventory.application.domain.service.vehicle.VehicleResource;
 import de.dhbw.fireinventory.domain.condition.Condition;
-import de.dhbw.fireinventory.domain.location.Location;
-import de.dhbw.fireinventory.domain.vehicle.Vehicle;
 
 import java.util.List;
 
 public class VehicleForm extends FormLayout {
-    TextField designationTextField = new TextField("Designation");
-    ComboBox<Location> locationComboBox = new ComboBox<>("Location");
+    TextField designationTextField = new TextField("Bezeichnung");
+    ComboBox<LocationResource> locationComboBox = new ComboBox<>("Abstellort");
     RadioButtonGroup<Condition> conditionRadioGroup = new RadioButtonGroup<>();
-    Button save = new Button("Save");
-    Button delete = new Button("Delete");
-    Button close = new Button("Cancel");
-    Binder<Vehicle> binder = new BeanValidationBinder<>(Vehicle.class);
-    private Vehicle vehicle = new Vehicle();
+    Button save = new Button("Speichern");
+    Button delete = new Button("Löschen");
+    Button close = new Button("Abbrechen");
+    Binder<VehicleResource> binder = new BeanValidationBinder<>(VehicleResource.class);
+    private VehicleResource vehicleResource = new VehicleResource();
 
-    public VehicleForm(List<Location> locations) {
-        locationComboBox.setItems(locations);
-        locationComboBox.setItemLabelGenerator(Location::getDesignation);
+    public VehicleForm(List<LocationResource> locationResources) {
+        locationComboBox.setItems(locationResources);
+        locationComboBox.setItemLabelGenerator(LocationResource::getDesignation);
         createConditionRadioButton();
 
         this.createConditionRadioButton();
         add(designationTextField, locationComboBox, conditionRadioGroup,createButtonsLayout());
         binder.bind(designationTextField, "designation");
-        binder.bind(locationComboBox, "location");
+        binder.bind(locationComboBox, "locationResource");
         binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
     }
 
@@ -51,9 +51,9 @@ public class VehicleForm extends FormLayout {
         conditionRadioGroup.setValue(Condition.FUNKTIONSFÄHIG);
     }
 
-    public void setVehicle(Vehicle vehicle) {
-        this.vehicle = vehicle;
-        binder.readBean(vehicle);
+    public void setVehicle(VehicleResource vehicleResource) {
+        this.vehicleResource = vehicleResource;
+        binder.readBean(vehicleResource);
     }
 
     private HorizontalLayout createButtonsLayout() {
@@ -65,7 +65,7 @@ public class VehicleForm extends FormLayout {
         close.addClickShortcut(Key.ESCAPE);
 
         save.addClickListener(event -> validateAndSave());
-        delete.addClickListener(event -> fireEvent(new VehicleForm.DeleteEvent(this, vehicle)));
+        delete.addClickListener(event -> fireEvent(new VehicleForm.DeleteEvent(this, vehicleResource)));
         close.addClickListener(event -> fireEvent(new VehicleForm.CloseEvent(this)));
 
         return new HorizontalLayout(save, delete, close);
@@ -73,8 +73,8 @@ public class VehicleForm extends FormLayout {
 
     public void validateAndSave() {
         try {
-            binder.writeBean(vehicle);
-            fireEvent(new SaveEvent(this, vehicle));
+            binder.writeBean(vehicleResource);
+            fireEvent(new SaveEvent(this, vehicleResource));
         } catch (ValidationException e) {
             e.printStackTrace();
         }
@@ -86,27 +86,27 @@ public class VehicleForm extends FormLayout {
     }
 
     public static abstract class VehicleFormEvent extends ComponentEvent<VehicleForm> {
-        private Vehicle vehicle;
+        private VehicleResource vehicleResource;
 
-        protected VehicleFormEvent(VehicleForm source, Vehicle vehicle) {
+        protected VehicleFormEvent(VehicleForm source, VehicleResource vehicleResource) {
             super(source, false);
-            this.vehicle = vehicle;
+            this.vehicleResource = vehicleResource;
         }
 
-        public Vehicle getVehicle() {
-            return vehicle;
+        public VehicleResource getVehicleResource() {
+            return vehicleResource;
         }
     }
 
     public static class SaveEvent extends VehicleForm.VehicleFormEvent {
-        SaveEvent(VehicleForm source, Vehicle vehicle) {
-            super(source, vehicle);
+        SaveEvent(VehicleForm source, VehicleResource vehicleResource) {
+            super(source, vehicleResource);
         }
     }
 
     public static class DeleteEvent extends VehicleForm.VehicleFormEvent {
-        DeleteEvent(VehicleForm source, Vehicle vehicle) {
-            super(source, vehicle);
+        DeleteEvent(VehicleForm source, VehicleResource vehicleResource) {
+            super(source, vehicleResource);
         }
 
     }

@@ -1,9 +1,8 @@
 package de.dhbw.plugins.mockito;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.dhbw.fireinventory.application.vehicle.VehicleApplicationService;
+import de.dhbw.fireinventory.application.domain.service.item.ItemApplicationService;
 import de.dhbw.fireinventory.domain.condition.Condition;
-import de.dhbw.fireinventory.domain.equipment.Equipment;
 import de.dhbw.fireinventory.domain.item.ItemRepository;
 import de.dhbw.fireinventory.domain.location.*;
 import de.dhbw.fireinventory.domain.status.Status;
@@ -24,11 +23,11 @@ public class VehicleTest {
     @Mock
     LocationRepository locationRepository;
 
-    VehicleApplicationService applicationService;
+    ItemApplicationService applicationService;
 
     @Before
     public void initiate() {
-        applicationService = new VehicleApplicationService(itemRepository, locationRepository);
+        applicationService = new ItemApplicationService(itemRepository);
     }
 
 

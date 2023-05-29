@@ -9,14 +9,13 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import de.dhbw.fireinventory.application.equipment.EquipmentApplicationService;
-import de.dhbw.fireinventory.application.item.ItemApplicationService;
-import de.dhbw.fireinventory.application.location.LocationApplicationService;
-import de.dhbw.fireinventory.domain.appointment.Appointment;
-import de.dhbw.fireinventory.domain.condition.Condition;
+import de.dhbw.fireinventory.adapter.application.equipment.EquipmentAppAdapter;
+import de.dhbw.fireinventory.adapter.application.item.ItemAppAdapter;
+import de.dhbw.fireinventory.adapter.application.location.LocationAppAdapter;
+import de.dhbw.fireinventory.application.domain.service.appointment.AppointmentResource;
+import de.dhbw.fireinventory.application.domain.service.equipment.EquipmentResource;
+import de.dhbw.fireinventory.application.domain.service.location.LocationResource;
 import de.dhbw.fireinventory.domain.status.Status;
-import de.dhbw.fireinventory.domain.equipment.Equipment;
-import de.dhbw.fireinventory.domain.location.Location;
 import de.dhbw.plugins.gui.vaadin.components.EquipmentGrid;
 import de.dhbw.plugins.gui.vaadin.components.ErrorMessage;
 import de.dhbw.plugins.gui.vaadin.forms.*;
@@ -28,19 +27,19 @@ public class EquipmentTabLayout extends AbstractTabLayout {
     TextField filterText = new TextField("Bezeichnung");
     HorizontalLayout filterLayout;
     EquipmentForm equipmentForm;
-    EquipmentApplicationService equipmentService;
-    LocationApplicationService locationService;
-    ItemApplicationService itemService;
-    ComboBox<Location> locationComboBox;
+    EquipmentAppAdapter equipmentAppAdapter;
+    LocationAppAdapter locationAppAdapter;
+    ItemAppAdapter itemAppAdapter;
+    ComboBox<LocationResource> locationComboBox;
     ComboBox<Status> statusComboBox;
 
-    public EquipmentTabLayout(EquipmentApplicationService equipmentService, LocationApplicationService locationService, ItemApplicationService itemService)
+    public EquipmentTabLayout(EquipmentAppAdapter equipmentAppAdapter, LocationAppAdapter locationAppAdapter, ItemAppAdapter itemAppAdapter)
     {
         super();
 
-        this.equipmentService = equipmentService;
-        this.locationService = locationService;
-        this.itemService = itemService;
+        this.equipmentAppAdapter = equipmentAppAdapter;
+        this.locationAppAdapter = locationAppAdapter;
+        this.itemAppAdapter = itemAppAdapter;
 
         configureGrid();
         configureEquipmentForm();
@@ -64,7 +63,7 @@ public class EquipmentTabLayout extends AbstractTabLayout {
     }
 
     private void configureEquipmentForm() {
-        equipmentForm = new EquipmentForm(locationService.findAllLocations(null));
+        equipmentForm = new EquipmentForm(locationAppAdapter.findAllLocations(null));
         equipmentForm.setWidth("25em");
         equipmentForm.addListener(EquipmentForm.SaveEvent.class, this::saveEquipment);
         equipmentForm.addListener(EquipmentForm.DeleteEvent.class, this::deleteEquipment);
@@ -72,20 +71,20 @@ public class EquipmentTabLayout extends AbstractTabLayout {
     }
 
     protected void configureGrid() {
-        grid = new EquipmentGrid(equipmentService);
+        grid = new EquipmentGrid(equipmentAppAdapter);
         grid.addListener(EquipmentGrid.AddAppointmentEvent.class, e -> addAppointment(e.getEquipment()));
         grid.addListener(EquipmentGrid.EditEquipmentEvent.class, e -> editEquipment(e.getEquipment()));
         grid.addListener(EquipmentGrid.EquipmentConditionChangedEvent.class, e -> changeCondition(e.getEquipment()));
     }
 
-    private void addAppointment(Equipment equipment) {
-        Appointment appointment = new Appointment();
-        appointment.setItem(equipment);
-        this.getUI().ifPresent(ui -> ui.navigate(Calendar.class).ifPresent(calendar -> calendar.editAppointment(appointment)));
+    private void addAppointment(EquipmentResource equipmentResource) {
+        AppointmentResource appointmentResource = new AppointmentResource();
+        appointmentResource.setItemResource(equipmentResource);
+        this.getUI().ifPresent(ui -> ui.navigate(Calendar.class).ifPresent(calendar -> calendar.editAppointment(appointmentResource)));
     }
 
-    private void changeCondition(Equipment equipment) {
-        equipmentService.changeCondition(equipment);
+    private void changeCondition(EquipmentResource equipmentResource) {
+        equipmentAppAdapter.changeCondition(equipmentResource);
         updateList();
     }
 
@@ -98,11 +97,11 @@ public class EquipmentTabLayout extends AbstractTabLayout {
         Icon filterIcon = new Icon(VaadinIcon.FILTER);
         filterIcon.addClickListener(e -> changeFilterVisibility());
 
-        Button addEquipmentButton = new Button("Add Equipment");
+        Button addEquipmentButton = new Button("Gerät hinzufügen");
 
         locationComboBox = new ComboBox<>("Location");
-        locationComboBox.setItems(locationService.findAllLocations(null));
-        locationComboBox.setItemLabelGenerator(Location::getDesignation);
+        locationComboBox.setItems(locationAppAdapter.findAllLocations(null));
+        locationComboBox.setItemLabelGenerator(LocationResource::getDesignation);
         locationComboBox.setClearButtonVisible(true);
         locationComboBox.addValueChangeListener(e -> updateList());
 
@@ -131,11 +130,11 @@ public class EquipmentTabLayout extends AbstractTabLayout {
 
     public void setStatusComboBox(Status status) { statusComboBox.setValue(status); }
 
-    public void editEquipment(Equipment equipment) {
-        if (equipment == null) {
+    public void editEquipment(EquipmentResource equipmentResource) {
+        if (equipmentResource == null) {
             closeEquipmentEditor();
         } else {
-            equipmentForm.setEquipment(equipment);
+            equipmentForm.setEquipment(equipmentResource);
             equipmentForm.setVisible(true);
             addClassName("editing");
         }
@@ -149,7 +148,7 @@ public class EquipmentTabLayout extends AbstractTabLayout {
 
     private void addEquipment() {
         grid.clearGridSelection();
-        editEquipment(new Equipment());
+        editEquipment(new EquipmentResource());
     }
 
     private void updateList() {
@@ -157,8 +156,8 @@ public class EquipmentTabLayout extends AbstractTabLayout {
     }
 
     private void saveEquipment(EquipmentForm.SaveEvent event) {
-        Equipment equipment = event.getEquipment();
-        equipmentService.saveEquipment(equipment);
+        EquipmentResource equipmentResource = event.getEquipmentResource();
+        equipmentAppAdapter.saveEquipment(equipmentResource);
         updateList();
         closeEquipmentEditor();
         fireEvent(new GridUpdatedEvent(this));
@@ -166,8 +165,8 @@ public class EquipmentTabLayout extends AbstractTabLayout {
 
     private void deleteEquipment(EquipmentForm.DeleteEvent event) {
         try {
-            Equipment equipment = event.getEquipment();
-            equipmentService.deleteEquipment(equipment);
+            EquipmentResource equipmentResource = event.getEquipmentResource();
+            equipmentAppAdapter.deleteEquipment(equipmentResource);
             updateList();
             closeEquipmentEditor();
             fireEvent(new GridUpdatedEvent(this));

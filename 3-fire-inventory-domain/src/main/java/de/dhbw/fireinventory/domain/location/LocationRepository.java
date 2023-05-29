@@ -15,4 +15,8 @@ public interface LocationRepository {
     List<Location> findAll();
 
     VehiclePlace findLocationForVehicle(Vehicle vehicle);
+
+    boolean hasLinkedItems(Location location);
+
+    boolean isPresent(Location location);
 }

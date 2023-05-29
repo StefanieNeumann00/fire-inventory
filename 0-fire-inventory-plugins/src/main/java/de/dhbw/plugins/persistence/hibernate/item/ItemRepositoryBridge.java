@@ -4,6 +4,7 @@ import de.dhbw.fireinventory.domain.status.Status;
 import de.dhbw.fireinventory.domain.item.Item;
 import de.dhbw.fireinventory.domain.item.ItemRepository;
 import de.dhbw.fireinventory.domain.location.Location;
+import de.dhbw.fireinventory.domain.vehicle.Vehicle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -47,5 +48,15 @@ public class ItemRepositoryBridge implements ItemRepository {
     @Override
     public void delete(Item item) {
         this.springDataItemRepository.delete(item);
+    }
+
+    @Override
+    public boolean hasLinkedItems(Vehicle vehicle) {
+        return this.springDataItemRepository.hasLinkedItems(vehicle);
+    }
+
+    @Override
+    public boolean isPresent(Item item) {
+        return this.springDataItemRepository.isPresent(item.getId());
     }
 }

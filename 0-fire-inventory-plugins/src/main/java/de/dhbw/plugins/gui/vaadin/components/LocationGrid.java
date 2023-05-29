@@ -3,45 +3,47 @@ package de.dhbw.plugins.gui.vaadin.components;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.shared.Registration;
-import de.dhbw.fireinventory.application.location.LocationApplicationService;
+import de.dhbw.fireinventory.adapter.application.location.LocationAppAdapter;
+import de.dhbw.fireinventory.application.domain.service.location.LocationApplicationService;
+import de.dhbw.fireinventory.application.domain.service.location.LocationResource;
 import de.dhbw.fireinventory.domain.location.Location;
 
-public class LocationGrid extends AbstractGrid<Location>{
-    LocationApplicationService locationService;
+public class LocationGrid extends AbstractGrid<LocationResource>{
+    LocationAppAdapter locationAppAdapter;
 
-    public LocationGrid(LocationApplicationService locationService) {
-        super(Location.class);
-        this.locationService = locationService;
+    public LocationGrid(LocationAppAdapter locationAppAdapter) {
+        super(LocationResource.class);
+        this.locationAppAdapter = locationAppAdapter;
         updateList(null);
     }
 
     protected void configureGridColumns() {
         this.getColumns().forEach(col -> col.setAutoWidth(true));
-        this.addColumn(Location::getDesignation).setHeader("Bezeichnung");
+        this.addColumn(LocationResource::getDesignation).setHeader("Bezeichnung");
         this.asSingleSelect().addValueChangeListener(event ->
                 fireEvent(new LocationGrid.EditLocationEvent(this, event.getValue())));
     }
 
     public void updateList(String filterText) {
-        this.setItems(locationService.findAllPlaces(filterText));
+        this.setItems(locationAppAdapter.findAllPlaces(filterText));
     }
 
     public static abstract class LocationGridEvent extends ComponentEvent<LocationGrid> {
-        private Location location;
+        private LocationResource locationResource;
 
-        protected LocationGridEvent(LocationGrid source, Location location) {
+        protected LocationGridEvent(LocationGrid source, LocationResource locationResource) {
             super(source, false);
-            this.location = location;
+            this.locationResource = locationResource;
         }
 
-        public Location getLocation() {
-            return location;
+        public LocationResource getLocationResource() {
+            return locationResource;
         }
     }
 
     public static class EditLocationEvent extends LocationGridEvent {
-        EditLocationEvent(LocationGrid source, Location location) {
-            super(source, location);
+        EditLocationEvent(LocationGrid source, LocationResource locationResource) {
+            super(source, locationResource);
         }
     }
 

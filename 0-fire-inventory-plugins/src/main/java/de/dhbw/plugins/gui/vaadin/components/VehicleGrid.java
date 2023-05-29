@@ -8,36 +8,39 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.provider.BackEndDataProvider;
 import com.vaadin.flow.shared.Registration;
-import de.dhbw.fireinventory.application.vehicle.VehicleApplicationService;
+import de.dhbw.fireinventory.adapter.application.vehicle.VehicleAppAdapter;
+import de.dhbw.fireinventory.application.domain.service.equipment.EquipmentResource;
+import de.dhbw.fireinventory.application.domain.service.item.ItemResource;
+import de.dhbw.fireinventory.application.domain.service.location.LocationResource;
+import de.dhbw.fireinventory.application.domain.service.vehicle.VehicleResource;
 import de.dhbw.fireinventory.domain.condition.Condition;
-import de.dhbw.fireinventory.domain.equipment.Equipment;
 import de.dhbw.fireinventory.domain.status.Status;
-import de.dhbw.fireinventory.domain.location.Location;
-import de.dhbw.fireinventory.domain.vehicle.Vehicle;
 
-public class VehicleGrid extends AbstractGrid<Vehicle> {
-    VehicleApplicationService vehicleService;
+import java.util.ArrayList;
+import java.util.List;
 
-    public VehicleGrid(VehicleApplicationService vehicleService) {
-        super(Vehicle.class);
-        this.vehicleService = vehicleService;
+public class VehicleGrid extends AbstractGrid<VehicleResource> {
+    VehicleAppAdapter vehicleAppAdapter;
+
+    public VehicleGrid(VehicleAppAdapter vehicleAppAdapter) {
+        super(VehicleResource.class);
+        this.vehicleAppAdapter = vehicleAppAdapter;
         updateList(null, null, null);
     }
 
     protected void configureGridColumns() {
         this.getColumns().forEach(col -> col.setAutoWidth(true));
-        this.addColumn(Vehicle::getDesignation).setHeader("Bezeichnung");
-        this.addColumn(v -> v.getLocation().getDesignation()).setHeader("Abstellort");
+        this.addColumn(VehicleResource::getDesignation).setHeader("Bezeichnung");
+        this.addColumn(v -> v.getLocationResource().getDesignation()).setHeader("Abstellort");
         this.addColumn(v -> v.getStatus().getDesignation()).setHeader("Status");
         this.addComponentColumn(v -> createManageIconBar(v)).setHeader("Manage");
         this.asSingleSelect().addValueChangeListener(event ->
                 fireEvent(new VehicleGrid.EditVehicleEvent(this, event.getValue())));
     }
 
-    public Component createManageIconBar(Vehicle vehicle){
+    public Component createManageIconBar(VehicleResource vehicleResource){
         HorizontalLayout manageBarLayout = new HorizontalLayout();
 
         Button addAppointmentButton = new Button();
@@ -50,8 +53,8 @@ public class VehicleGrid extends AbstractGrid<Vehicle> {
         manageBarLayout.add(addAppointmentButton);
         manageBarLayout.add(conditionChangedButton);
 
-        addAppointmentButton.addClickListener(event -> fireEvent(new VehicleGrid.AddAppointmentEvent(this, vehicle)));
-        conditionChangedButton.addClickListener(event -> conditionChangedButtonClicked(conditionChangedButton, vehicle));
+        addAppointmentButton.addClickListener(event -> fireEvent(new VehicleGrid.AddAppointmentEvent(this, vehicleResource)));
+        conditionChangedButton.addClickListener(event -> conditionChangedButtonClicked(conditionChangedButton, vehicleResource));
 
         addAppointmentButton.setIcon(new Icon(VaadinIcon.CALENDAR));
         conditionChangedButton.setIcon(new Icon(VaadinIcon.MINUS_CIRCLE));
@@ -59,49 +62,56 @@ public class VehicleGrid extends AbstractGrid<Vehicle> {
         return manageBarLayout;
     }
 
-    private void conditionChangedButtonClicked(Button button, Vehicle vehicle) {
-        if (vehicle.getCondition() == Condition.FUNKTIONSFÄHIG){
+    private void conditionChangedButtonClicked(Button button, VehicleResource vehicleResource) {
+        if (vehicleResource.getCondition() == Condition.FUNKTIONSFÄHIG){
             button.setIcon(new Icon(VaadinIcon.COG));
         }
-        else if (vehicle.getCondition() == Condition.NICHT_FUNKTIONSFÄHIG){
+        else if (vehicleResource.getCondition() == Condition.NICHT_FUNKTIONSFÄHIG){
             button.setIcon(new Icon(VaadinIcon.CHECK));
         }
         else { button.setIcon(new Icon(VaadinIcon.MINUS_CIRCLE));}
-        fireEvent(new VehicleGrid.VehicleConditionChangedEvent(this, vehicle));
+        fireEvent(new VehicleGrid.VehicleConditionChangedEvent(this, vehicleResource));
     }
 
-    public void updateList(Location location, Status status, String filterText) {
-        this.setItems(vehicleService.findAllVehiclesBy(location, status, filterText));
+    public void updateList(LocationResource locationResource, Status status, String filterText) {
+        List<ItemResource> itemResources = vehicleAppAdapter.findAllVehiclesBy(locationResource, status, filterText);
+        List<VehicleResource> vehicleResources = new ArrayList<>();
+        for (ItemResource itemResource : itemResources) {
+            if (itemResource instanceof VehicleResource) {
+                vehicleResources.add((VehicleResource) itemResource);
+            }
+        }
+        this.setItems(vehicleResources);
     }
 
     public static abstract class VehicleGridEvent extends ComponentEvent<VehicleGrid> {
-        private Vehicle vehicle;
+        private VehicleResource vehicleResource;
 
-        protected VehicleGridEvent(VehicleGrid source, Vehicle vehicle) {
+        protected VehicleGridEvent(VehicleGrid source, VehicleResource vehicleResource) {
             super(source, false);
-            this.vehicle = vehicle;
+            this.vehicleResource = vehicleResource;
         }
 
-        public Vehicle getVehicle() {
-            return vehicle;
+        public VehicleResource getVehicleResource() {
+            return vehicleResource;
         }
     }
 
     public static class AddAppointmentEvent extends VehicleGrid.VehicleGridEvent {
-        AddAppointmentEvent(VehicleGrid source, Vehicle vehicle) {
-            super(source, vehicle);
+        AddAppointmentEvent(VehicleGrid source, VehicleResource vehicleResource) {
+            super(source, vehicleResource);
         }
     }
 
     public static class VehicleConditionChangedEvent extends VehicleGrid.VehicleGridEvent {
-        VehicleConditionChangedEvent(VehicleGrid source, Vehicle vehicle) {
-            super(source, vehicle);
+        VehicleConditionChangedEvent(VehicleGrid source, VehicleResource vehicleResource) {
+            super(source, vehicleResource);
         }
     }
 
     public static class EditVehicleEvent extends VehicleGrid.VehicleGridEvent {
-        EditVehicleEvent(VehicleGrid source, Vehicle vehicle) {
-            super(source, vehicle);
+        EditVehicleEvent(VehicleGrid source, VehicleResource vehicleResource) {
+            super(source, vehicleResource);
         }
     }
 

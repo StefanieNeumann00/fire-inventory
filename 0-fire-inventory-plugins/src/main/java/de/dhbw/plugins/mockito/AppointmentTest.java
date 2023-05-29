@@ -2,14 +2,13 @@ package de.dhbw.plugins.mockito;
 
 import static org.mockito.Mockito.when;
 
-import de.dhbw.fireinventory.application.appointment.AppointmentApplicationService;
+import de.dhbw.fireinventory.application.domain.service.appointment.AppointmentApplicationService;
 import de.dhbw.fireinventory.domain.appointment.Appointment;
 import de.dhbw.fireinventory.domain.appointment.AppointmentRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;

@@ -1,8 +1,7 @@
 package de.dhbw.plugins.mockito;
 
 import static org.mockito.Mockito.when;
-import de.dhbw.fireinventory.application.location.LocationApplicationService;
-import de.dhbw.fireinventory.domain.condition.Condition;
+import de.dhbw.fireinventory.application.domain.service.location.LocationApplicationService;
 import de.dhbw.fireinventory.domain.location.*;
 import org.junit.Before;
 import org.junit.Test;

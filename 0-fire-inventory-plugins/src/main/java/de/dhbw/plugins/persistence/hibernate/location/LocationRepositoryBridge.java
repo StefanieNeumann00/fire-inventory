@@ -45,5 +45,15 @@ public class LocationRepositoryBridge implements LocationRepository {
         return this.springDataLocationRepository.findLocationForVehicle(vehicle);
     }
 
+    @Override
+    public boolean hasLinkedItems(Location location) {
+        return  this.springDataLocationRepository.hasLinkedItems(location);
+    }
+
+    @Override
+    public boolean isPresent(Location location) {
+        return this.springDataLocationRepository.isPresent(location.getId());
+    }
+
 
 }

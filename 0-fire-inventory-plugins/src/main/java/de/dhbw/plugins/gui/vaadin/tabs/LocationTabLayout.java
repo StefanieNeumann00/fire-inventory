@@ -8,7 +8,10 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import de.dhbw.fireinventory.application.location.LocationApplicationService;
+import de.dhbw.fireinventory.adapter.application.location.LocationAppAdapter;
+import de.dhbw.fireinventory.application.domain.service.internalPlace.InternalPlaceResource;
+import de.dhbw.fireinventory.application.domain.service.location.LocationApplicationService;
+import de.dhbw.fireinventory.application.domain.service.location.LocationResource;
 import de.dhbw.fireinventory.domain.location.InternalPlace;
 import de.dhbw.fireinventory.domain.location.Location;
 import de.dhbw.plugins.gui.vaadin.components.ErrorMessage;
@@ -22,13 +25,13 @@ public class LocationTabLayout extends AbstractTabLayout{
     TextField filterText = new TextField("Bezeichnung");
     HorizontalLayout filterLayout;
     LocationForm locationForm;
-    LocationApplicationService locationService;
+    LocationAppAdapter locationAppAdapter;
 
-    public LocationTabLayout(LocationApplicationService locationService)
+    public LocationTabLayout(LocationAppAdapter locationAppAdapter)
     {
         super();
 
-        this.locationService = locationService;
+        this.locationAppAdapter = locationAppAdapter;
 
         configureGrid();
         configurePlaceForm();
@@ -60,15 +63,15 @@ public class LocationTabLayout extends AbstractTabLayout{
     }
 
     protected void configureGrid() {
-        grid = new LocationGrid(locationService);
-        grid.addListener(LocationGrid.EditLocationEvent.class, e -> editLocation(e.getLocation()));
+        grid = new LocationGrid(locationAppAdapter);
+        grid.addListener(LocationGrid.EditLocationEvent.class, e -> editLocation(e.getLocationResource()));
     }
 
-    private void editLocation(Location location) {
-        if (location == null) {
+    private void editLocation(LocationResource locationResource) {
+        if (locationResource == null) {
             closePlaceEditor();
         } else {
-            locationForm.setLocation(location);
+            locationForm.setLocation(locationResource);
             locationForm.setVisible(true);
             addClassName("editing");
         }
@@ -82,7 +85,7 @@ public class LocationTabLayout extends AbstractTabLayout{
 
     private void addInternalLocation() {
         grid.clearGridSelection();
-        editLocation(new InternalPlace());
+        editLocation(new InternalPlaceResource());
     }
 
     private void updateList() {
@@ -90,21 +93,21 @@ public class LocationTabLayout extends AbstractTabLayout{
     }
 
     private void savePlace(LocationForm.SaveEvent event) {
-        Location location = event.getLocation();
-        locationService.saveLocation(location);
+        LocationResource locationResource = event.getLocationResource();
+        locationAppAdapter.saveLocation(locationResource);
         updateList();
         closePlaceEditor();
     }
 
     private void deletePlace(LocationForm.DeleteEvent event) {
         try {
-            locationService.deleteLocation(event.getLocation());
-            locationService.deleteLocation(event.getLocation());
+            locationAppAdapter.deleteLocation(event.getLocationResource());
+            locationAppAdapter.deleteLocation(event.getLocationResource());
             updateList();
             closePlaceEditor();
         }
         catch (DataIntegrityViolationException exception) {
-            new ErrorMessage("You cannot delete this place since there are still equipments attached.");
+            new ErrorMessage("Diese Räumlichkeit kann nicht gelöscht werden, da es noch verknüpfte Gegenstände gibt.");
         }
 
     }
@@ -118,7 +121,7 @@ public class LocationTabLayout extends AbstractTabLayout{
         Icon filterIcon = new Icon(VaadinIcon.FILTER);
         filterIcon.addClickListener(e -> changeFilterVisibility());
 
-        Button addPlaceButton = new Button("Add Place");
+        Button addPlaceButton = new Button("Interne Räumlichkeit hinzufügen");
 
         addPlaceButton.addClickListener(event -> addInternalLocation());
 

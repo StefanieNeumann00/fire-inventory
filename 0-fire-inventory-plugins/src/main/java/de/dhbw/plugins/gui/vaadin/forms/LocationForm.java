@@ -12,16 +12,18 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.shared.Registration;
+import de.dhbw.fireinventory.application.domain.service.internalPlace.InternalPlaceResource;
+import de.dhbw.fireinventory.application.domain.service.location.LocationResource;
 import de.dhbw.fireinventory.domain.location.InternalPlace;
 import de.dhbw.fireinventory.domain.location.Location;
 
 public class LocationForm extends FormLayout {
-    TextField designation = new TextField("Designation");
-    Button save = new Button("Save");
-    Button delete = new Button("delete");
-    Button close = new Button("Cancel");
-    Binder<Location> binder = new BeanValidationBinder<>(Location.class);
-    private Location location = new InternalPlace();
+    TextField designation = new TextField("Bezeichnung");
+    Button save = new Button("Speichern");
+    Button delete = new Button("Löschen");
+    Button close = new Button("Abbrechen");
+    Binder<LocationResource> binder = new BeanValidationBinder<>(LocationResource.class);
+    private LocationResource locationResource = new InternalPlaceResource();
 
     public LocationForm() {
         this.add(designation,createButtonsLayout());
@@ -29,9 +31,9 @@ public class LocationForm extends FormLayout {
         binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
     }
 
-    public void setLocation(Location location) {
-        this.location = location;
-        binder.readBean(location);
+    public void setLocation(LocationResource locationResource) {
+        this.locationResource = locationResource;
+        binder.readBean(locationResource);
     }
 
     private HorizontalLayout createButtonsLayout() {
@@ -43,7 +45,7 @@ public class LocationForm extends FormLayout {
         close.addClickShortcut(Key.ESCAPE);
 
         save.addClickListener(event -> validateAndSave());
-        delete.addClickListener(event -> fireEvent(new DeleteEvent(this, location)));
+        delete.addClickListener(event -> fireEvent(new DeleteEvent(this, locationResource)));
         close.addClickListener(event -> fireEvent(new CloseEvent(this)));
 
         return new HorizontalLayout(save, delete,  close);
@@ -51,35 +53,35 @@ public class LocationForm extends FormLayout {
 
     public void validateAndSave() {
         try {
-            binder.writeBean(location);
-            fireEvent(new LocationForm.SaveEvent(this, location));
+            binder.writeBean(locationResource);
+            fireEvent(new LocationForm.SaveEvent(this, locationResource));
         } catch (ValidationException e) {
             e.printStackTrace();
         }
     }
 
     public static abstract class LocationFormEvent extends ComponentEvent<LocationForm> {
-        private Location location;
+        private LocationResource locationResource;
 
-        protected LocationFormEvent(LocationForm source, Location location) {
+        protected LocationFormEvent(LocationForm source, LocationResource locationResource) {
             super(source, false);
-            this.location = location;
+            this.locationResource = locationResource;
         }
 
-        public Location getLocation() {
-            return location;
+        public LocationResource getLocationResource() {
+            return locationResource;
         }
     }
 
     public static class SaveEvent extends LocationFormEvent {
-        SaveEvent(LocationForm source, Location location) {
-            super(source, location);
+        SaveEvent(LocationForm source, LocationResource locationResource) {
+            super(source, locationResource);
         }
     }
 
     public static class DeleteEvent extends LocationFormEvent {
-        DeleteEvent(LocationForm source, Location location) {
-            super(source, location);
+        DeleteEvent(LocationForm source, LocationResource locationResource) {
+            super(source, locationResource);
         }
 
     }

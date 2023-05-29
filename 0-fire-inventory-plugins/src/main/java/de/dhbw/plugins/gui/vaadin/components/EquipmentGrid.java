@@ -8,35 +8,39 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.data.provider.BackEndDataProvider;
 import com.vaadin.flow.shared.Registration;
-import de.dhbw.fireinventory.application.equipment.EquipmentApplicationService;
+import de.dhbw.fireinventory.adapter.application.equipment.EquipmentAppAdapter;
+import de.dhbw.fireinventory.application.domain.service.equipment.EquipmentResource;
+import de.dhbw.fireinventory.application.domain.service.item.ItemResource;
+import de.dhbw.fireinventory.application.domain.service.location.LocationResource;
 import de.dhbw.fireinventory.domain.condition.Condition;
 import de.dhbw.fireinventory.domain.status.Status;
-import de.dhbw.fireinventory.domain.equipment.Equipment;
-import de.dhbw.fireinventory.domain.location.Location;
 
-public class EquipmentGrid extends AbstractGrid<Equipment> {
+import java.util.ArrayList;
+import java.util.List;
 
-    EquipmentApplicationService equipmentService;
+public class EquipmentGrid extends AbstractGrid<EquipmentResource> {
 
-    public EquipmentGrid(EquipmentApplicationService equipmentService) {
-        super(Equipment.class);
-        this.equipmentService = equipmentService;
+    EquipmentAppAdapter equipmentAppAdapter;
+
+    public EquipmentGrid(EquipmentAppAdapter equipmentAppAdapter) {
+        super(EquipmentResource.class);
+        this.equipmentAppAdapter = equipmentAppAdapter;
         updateList(null, null, null);
     }
 
     protected void configureGridColumns() {
         this.getColumns().forEach(col -> col.setAutoWidth(true));
-        this.addColumn(Equipment::getDesignation).setHeader("Bezeichnung");
-        this.addColumn(e -> e.getLocation().getDesignation()).setHeader("Ablageort");
+        this.addColumn(EquipmentResource::getDesignation).setHeader("Bezeichnung");
+        this.addColumn(e -> e.getLocationResource().getDesignation()).setHeader("Ablageort");
         this.addColumn(e -> e.getStatus().getDesignation()).setHeader("Status");
         this.addComponentColumn(e -> createManageIconBar(e)).setHeader("Manage");
         this.asSingleSelect().addValueChangeListener(event ->
                 fireEvent(new EditEquipmentEvent(this, event.getValue())));
     }
 
-    public Component createManageIconBar(Equipment equipment){
+    public Component createManageIconBar(EquipmentResource equipmentResource){
         HorizontalLayout manageBarLayout = new HorizontalLayout();
 
         Button addAppointmentButton = new Button();
@@ -50,8 +54,8 @@ public class EquipmentGrid extends AbstractGrid<Equipment> {
         manageBarLayout.add(addAppointmentButton);
         manageBarLayout.add(conditionChangedButton);
 
-        addAppointmentButton.addClickListener(event -> fireEvent(new EquipmentGrid.AddAppointmentEvent(this, equipment)));
-        conditionChangedButton.addClickListener(event -> conditionChangedButtonClicked(conditionChangedButton, equipment));
+        addAppointmentButton.addClickListener(event -> fireEvent(new EquipmentGrid.AddAppointmentEvent(this, equipmentResource)));
+        conditionChangedButton.addClickListener(event -> conditionChangedButtonClicked(conditionChangedButton, equipmentResource));
 
         addAppointmentButton.setIcon(new Icon(VaadinIcon.CALENDAR));
         conditionChangedButton.setIcon(new Icon(VaadinIcon.MINUS_CIRCLE));
@@ -59,49 +63,56 @@ public class EquipmentGrid extends AbstractGrid<Equipment> {
         return manageBarLayout;
     }
 
-    private void conditionChangedButtonClicked(Button button, Equipment equipment) {
-        if (equipment.getCondition() == Condition.FUNKTIONSFÄHIG){
+    private void conditionChangedButtonClicked(Button button, EquipmentResource equipmentResource) {
+        if (equipmentResource.getCondition() == Condition.FUNKTIONSFÄHIG){
             button.setIcon(new Icon(VaadinIcon.COG));
         }
-        else if (equipment.getCondition() == Condition.NICHT_FUNKTIONSFÄHIG){
+        else if (equipmentResource.getCondition() == Condition.NICHT_FUNKTIONSFÄHIG){
             button.setIcon(new Icon(VaadinIcon.CHECK));
         }
         else { button.setIcon(new Icon(VaadinIcon.MINUS_CIRCLE));}
-        fireEvent(new EquipmentGrid.EquipmentConditionChangedEvent(this, equipment));
+        fireEvent(new EquipmentGrid.EquipmentConditionChangedEvent(this, equipmentResource));
     }
 
-    public void updateList(Location location, Status status, String filterText) {
-        this.setItems(equipmentService.findAllEquipmentsBy(location, status, filterText));
+    public void updateList(LocationResource locationResource, Status status, String filterText) {
+        List<ItemResource> itemResources = equipmentAppAdapter.findAllEquipmentsBy(locationResource, status, filterText);
+        List<EquipmentResource> equipmentResources = new ArrayList<>();
+        for (ItemResource itemResource : itemResources) {
+            if (itemResource instanceof EquipmentResource) {
+                equipmentResources.add((EquipmentResource) itemResource);
+            }
+        }
+        this.setItems(equipmentResources);
     }
 
     public static abstract class EquipmentGridEvent extends ComponentEvent<EquipmentGrid> {
-        private Equipment equipment;
+        private EquipmentResource equipmentResource;
 
-        protected EquipmentGridEvent(EquipmentGrid source, Equipment equipment) {
+        protected EquipmentGridEvent(EquipmentGrid source, EquipmentResource equipmentResource) {
             super(source, false);
-            this.equipment = equipment;
+            this.equipmentResource = equipmentResource;
         }
 
-        public Equipment getEquipment() {
-            return equipment;
+        public EquipmentResource getEquipment() {
+            return equipmentResource;
         }
     }
 
     public static class AddAppointmentEvent extends EquipmentGrid.EquipmentGridEvent {
-        AddAppointmentEvent(EquipmentGrid source, Equipment equipment) {
-            super(source, equipment);
+        AddAppointmentEvent(EquipmentGrid source, EquipmentResource equipmentResource) {
+            super(source, equipmentResource);
         }
     }
 
     public static class EquipmentConditionChangedEvent extends EquipmentGrid.EquipmentGridEvent {
-        EquipmentConditionChangedEvent(EquipmentGrid source, Equipment equipment) {
-            super(source, equipment);
+        EquipmentConditionChangedEvent(EquipmentGrid source, EquipmentResource equipmentResource) {
+            super(source, equipmentResource);
         }
     }
 
     public static class EditEquipmentEvent extends EquipmentGrid.EquipmentGridEvent {
-        EditEquipmentEvent(EquipmentGrid source, Equipment equipment) {
-            super(source, equipment);
+        EditEquipmentEvent(EquipmentGrid source, EquipmentResource equipmentResource) {
+            super(source, equipmentResource);
         }
     }
 

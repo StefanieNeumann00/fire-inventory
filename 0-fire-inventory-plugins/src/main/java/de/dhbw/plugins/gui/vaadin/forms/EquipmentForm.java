@@ -16,6 +16,8 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.shared.Registration;
+import de.dhbw.fireinventory.application.domain.service.equipment.EquipmentResource;
+import de.dhbw.fireinventory.application.domain.service.location.LocationResource;
 import de.dhbw.fireinventory.domain.condition.Condition;
 import de.dhbw.fireinventory.domain.equipment.Equipment;
 import de.dhbw.fireinventory.domain.location.Location;
@@ -23,23 +25,23 @@ import de.dhbw.fireinventory.domain.location.Location;
 import java.util.List;
 
 public class EquipmentForm extends FormLayout {
-        TextField designationTextField = new TextField("Designation");
-        ComboBox<Location> locationComboBox = new ComboBox<>("Location");
+        TextField designationTextField = new TextField("Bezeichnung");
+        ComboBox<LocationResource> locationComboBox = new ComboBox<>("Ablageort");
         RadioButtonGroup<Condition> conditionRadioGroup = new RadioButtonGroup<>();
-        Button save = new Button("Save");
-        Button delete = new Button("delete");
-        Button cancel = new Button("Cancel");
-        Binder<Equipment> binder = new BeanValidationBinder<>(Equipment.class);
-        private Equipment equipment = new Equipment();
+        Button save = new Button("Speichern");
+        Button delete = new Button("Löschen");
+        Button cancel = new Button("Abbrechen");
+        Binder<EquipmentResource> binder = new BeanValidationBinder<>(EquipmentResource.class);
+        private EquipmentResource equipmentResource = new EquipmentResource();
 
-        public EquipmentForm(List<Location> locations) {
-            locationComboBox.setItems(locations);
-            locationComboBox.setItemLabelGenerator(Location::getDesignation);
+        public EquipmentForm(List<LocationResource> locationResources) {
+            locationComboBox.setItems(locationResources);
+            locationComboBox.setItemLabelGenerator(LocationResource::getDesignation);
             createConditionRadioButton();
 
             add(designationTextField, locationComboBox, conditionRadioGroup, createButtonsLayout());
             binder.bind(designationTextField, "designation");
-            binder.bind(locationComboBox, "location");
+            binder.bind(locationComboBox, "locationResource");
             binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
         }
 
@@ -51,9 +53,9 @@ public class EquipmentForm extends FormLayout {
             conditionRadioGroup.setValue(Condition.FUNKTIONSFÄHIG);
         }
 
-        public void setEquipment(Equipment equipment) {
-            this.equipment = equipment;
-            binder.readBean(equipment);
+        public void setEquipment(EquipmentResource equipmentResource) {
+            this.equipmentResource = equipmentResource;
+            binder.readBean(equipmentResource);
         }
 
         private HorizontalLayout createButtonsLayout() {
@@ -65,7 +67,7 @@ public class EquipmentForm extends FormLayout {
             cancel.addClickShortcut(Key.ESCAPE);
 
             save.addClickListener(event -> validateAndSave());
-            delete.addClickListener(event -> fireEvent(new DeleteEvent(this, equipment)));
+            delete.addClickListener(event -> fireEvent(new DeleteEvent(this, equipmentResource)));
             cancel.addClickListener(event -> fireEvent(new CloseEvent(this)));
 
             HorizontalLayout layout = new HorizontalLayout(save, delete, cancel);
@@ -77,35 +79,35 @@ public class EquipmentForm extends FormLayout {
 
         public void validateAndSave() {
             try {
-                binder.writeBean(equipment);
-                fireEvent(new SaveEvent(this, equipment));
+                binder.writeBean(equipmentResource);
+                fireEvent(new SaveEvent(this, equipmentResource));
             } catch (ValidationException e) {
                 e.printStackTrace();
             }
         }
 
     public static abstract class EquipmentFormEvent extends ComponentEvent<EquipmentForm> {
-        private Equipment equipment;
+        private EquipmentResource equipmentResource;
 
-        protected EquipmentFormEvent(EquipmentForm source, Equipment equipment) {
+        protected EquipmentFormEvent(EquipmentForm source, EquipmentResource equipmentResource) {
             super(source, false);
-            this.equipment = equipment;
+            this.equipmentResource = equipmentResource;
         }
 
-        public Equipment getEquipment() {
-            return equipment;
+        public EquipmentResource getEquipmentResource() {
+            return equipmentResource;
         }
     }
 
     public static class SaveEvent extends EquipmentFormEvent {
-        SaveEvent(EquipmentForm source, Equipment equipment) {
-            super(source, equipment);
+        SaveEvent(EquipmentForm source, EquipmentResource equipmentResource) {
+            super(source, equipmentResource);
         }
     }
 
     public static class DeleteEvent extends EquipmentFormEvent {
-        DeleteEvent(EquipmentForm source, Equipment equipment) {
-            super(source, equipment);
+        DeleteEvent(EquipmentForm source, EquipmentResource equipmentResource) {
+            super(source, equipmentResource);
         }
 
     }

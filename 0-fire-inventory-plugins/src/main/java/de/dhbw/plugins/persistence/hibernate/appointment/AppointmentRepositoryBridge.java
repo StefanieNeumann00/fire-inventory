@@ -47,4 +47,9 @@ public class AppointmentRepositoryBridge implements AppointmentRepository {
     public List<Appointment> findAppointmentsForItemAndDes(Item item, String designation) {
         return this.springDataAppointmentRepository.findForItemAndDes(item, designation);
     }
+
+    @Override
+    public boolean isPresent(Appointment appointment) {
+        return this.springDataAppointmentRepository.isPresent(appointment.getId());
+    }
 }

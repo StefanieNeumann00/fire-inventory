@@ -22,4 +22,7 @@ public interface SpringDataAppointmentRepository extends JpaRepository<Appointme
 
     @Query(value = "select a from Appointment a where lower(a.designation) like lower(concat('%', :designation, '%'))")
     public List<Appointment> findForDesignation(@Param("designation") String designation);
+
+    @Query(value = "select case when exists (select * from Appointment where id = :appointmentId) then cast (1 as bit) else cast (0 as bit) end", nativeQuery = true)
+    boolean isPresent(@Param("appointmentId") UUID appointmentId);
 }

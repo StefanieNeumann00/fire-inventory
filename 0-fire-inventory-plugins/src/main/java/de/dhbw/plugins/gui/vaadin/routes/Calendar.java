@@ -10,10 +10,10 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import de.dhbw.fireinventory.application.appointment.AppointmentApplicationService;
-import de.dhbw.fireinventory.application.item.ItemApplicationService;
-import de.dhbw.fireinventory.domain.appointment.Appointment;
-import de.dhbw.fireinventory.domain.item.Item;
+import de.dhbw.fireinventory.adapter.application.appointment.AppointmentAppAdapter;
+import de.dhbw.fireinventory.adapter.application.item.ItemAppAdapter;
+import de.dhbw.fireinventory.application.domain.service.appointment.AppointmentResource;
+import de.dhbw.fireinventory.application.domain.service.item.ItemResource;
 import de.dhbw.plugins.gui.vaadin.MainLayout;
 import de.dhbw.plugins.gui.vaadin.forms.AppointmentForm;
 import de.dhbw.plugins.gui.vaadin.forms.ListViewForm;
@@ -26,11 +26,11 @@ import java.util.List;
 @PageTitle("Dashboard | FireInventory")
 public class Calendar extends VerticalLayout {
 
-    private final ItemApplicationService itemService;
-    private final AppointmentApplicationService appointmentService;
+    private final ItemAppAdapter itemAppAdapter;
+    private final AppointmentAppAdapter appointmentAppAdapter;
 
     TextField filterText = new TextField("Bezeichnung");
-    ComboBox<Item> itemComboBox;
+    ComboBox<ItemResource> itemComboBox;
     HorizontalLayout filterLayout;
 
     AppointmentForm appointmentForm;
@@ -38,9 +38,9 @@ public class Calendar extends VerticalLayout {
     
     YearCalendar calendar;
 
-    public Calendar(ItemApplicationService itemService, AppointmentApplicationService appointmentService) {
-        this.itemService = itemService;
-        this.appointmentService = appointmentService;
+    public Calendar(ItemAppAdapter itemAppAdapter, AppointmentAppAdapter appointmentAppAdapter) {
+        this.itemAppAdapter = itemAppAdapter;
+        this.appointmentAppAdapter = appointmentAppAdapter;
         addClassName("calendar-view");
         addClassName("full-height-layout");
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
@@ -77,15 +77,15 @@ public class Calendar extends VerticalLayout {
         Icon filterIcon = new Icon(VaadinIcon.FILTER);
         filterIcon.addClickListener(e -> changeFilterVisibility());
 
-        Button addAppointmentButton = new Button("Add Appointment");
+        Button addAppointmentButton = new Button("Termin hinzufügen");
 
-        itemComboBox = new ComboBox<>("Item");
-        itemComboBox.setItems(itemService.findAllItems());
-        itemComboBox.setItemLabelGenerator(Item::getDesignation);
+        itemComboBox = new ComboBox<>("Gegenstand");
+        itemComboBox.setItems(itemAppAdapter.findAllItems());
+        itemComboBox.setItemLabelGenerator(ItemResource::getDesignation);
         itemComboBox.setClearButtonVisible(true);
         itemComboBox.addValueChangeListener(e -> updateCalendarView());
 
-        addAppointmentButton.addClickListener(event -> editAppointment(new Appointment()));
+        addAppointmentButton.addClickListener(event -> editAppointment(new AppointmentResource()));
 
         HorizontalLayout buttonsLayout = new HorizontalLayout(filterIcon, addAppointmentButton);
         buttonsLayout.setAlignItems(Alignment.CENTER);
@@ -98,7 +98,7 @@ public class Calendar extends VerticalLayout {
     }
 
     private void updateCalendarView() {
-        List<LocalDate> dates = appointmentService.findAppointmentDatesFor(itemComboBox.getValue(), filterText.getValue());
+        List<LocalDate> dates = appointmentAppAdapter.findAppointmentDatesFor(itemComboBox.getValue(), filterText.getValue());
         calendar.setClassNameGenerator(date -> {
             if (date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.SUNDAY) {
                 return "weekend";
@@ -114,7 +114,7 @@ public class Calendar extends VerticalLayout {
     }
 
     private void updateViewList() {
-        listView.setAppointments(appointmentService.findAllAppointmentsFor(itemComboBox.getValue(), filterText.getValue()));
+        listView.setAppointments(appointmentAppAdapter.findAllAppointmentsFor(itemComboBox.getValue(), filterText.getValue()));
         listView.setVisible(true);
         addClassName("editing");
     }
@@ -125,12 +125,12 @@ public class Calendar extends VerticalLayout {
     }
 
 
-    public void editAppointment(Appointment appointment) {
+    public void editAppointment(AppointmentResource appointmentResource) {
         closeListViewEditor();
-        if (appointment == null) {
+        if (appointmentResource == null) {
             closeAppointmentEditor();
         } else {
-            appointmentForm.setAppointment(appointment);
+            appointmentForm.setAppointment(appointmentResource);
             appointmentForm.setVisible(true);
             addClassName("editing");
             if (itemComboBox.getValue() != null) {
@@ -140,7 +140,7 @@ public class Calendar extends VerticalLayout {
     }
 
     private void createAppointmentForDate(LocalDate date) {
-        editAppointment(new Appointment());
+        editAppointment(new AppointmentResource());
         appointmentForm.setDate(date);
     }
 
@@ -158,7 +158,7 @@ public class Calendar extends VerticalLayout {
     }
 
     private void configureAppointmentForm() {
-        appointmentForm = new AppointmentForm(itemService.findAllItems());
+        appointmentForm = new AppointmentForm(itemAppAdapter.findAllItems());
         appointmentForm.setWidth("25em");
         appointmentForm.addListener(AppointmentForm.SaveEvent.class, this::saveAppointment);
         appointmentForm.addListener(AppointmentForm.DeleteEvent.class, this::deleteAppointment);
@@ -166,21 +166,21 @@ public class Calendar extends VerticalLayout {
     }
 
     private void deleteAppointment(AppointmentForm.DeleteEvent event) {
-        appointmentService.deleteAppointment(event.getAppointment());
+        appointmentAppAdapter.deleteAppointment(event.getAppointmentResource());
     }
 
     private void saveAppointment(AppointmentForm.SaveEvent event) {
-        Appointment appointment = event.getAppointment();
+        AppointmentResource appointmentResource = event.getAppointmentResource();
         LocalDate date = appointmentForm.getDueDate();
-        appointment.setDueDate(date);
-        appointmentService.saveAppointment(appointment);
+        appointmentResource.setDueDate(date);
+        appointmentAppAdapter.saveAppointment(appointmentResource);
         updateCalendarView();
         closeAppointmentEditor();
     }
 
     private void configureAppointmentList() {
-        listView = new ListViewForm(appointmentService.findAllAppointmentsFor(itemComboBox.getValue(), filterText.getValue()));
-        listView.addListener(ListViewForm.SelectEvent.class, e -> editAppointment(e.getAppointment()));
+        listView = new ListViewForm(appointmentAppAdapter.findAllAppointmentsFor(itemComboBox.getValue(), filterText.getValue()));
+        listView.addListener(ListViewForm.SelectEvent.class, e -> editAppointment(e.getAppointmentResource()));
         listView.setWidth("25em");
     }
 }

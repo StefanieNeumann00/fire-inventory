@@ -17,4 +17,6 @@ public interface AppointmentRepository {
     List<Appointment> findAppointmentsForDesignation(String designation);
 
     List<Appointment> findAppointmentsForItemAndDes(Item item, String designation);
+
+    boolean isPresent(Appointment appointment);
 }

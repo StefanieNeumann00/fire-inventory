@@ -24,7 +24,9 @@ public abstract class AbstractEntity {
     }
 
     public void setId(UUID id) {
-        this.id = id;
+        if (id != null) {
+            this.id = id;
+        }
     }
 
     public String getDesignation() {

@@ -9,16 +9,15 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import de.dhbw.fireinventory.application.appointment.AppointmentApplicationService;
-import de.dhbw.fireinventory.application.item.ItemApplicationService;
-import de.dhbw.fireinventory.application.location.LocationApplicationService;
-import de.dhbw.fireinventory.application.vehicle.VehicleApplicationService;
-import de.dhbw.fireinventory.domain.appointment.Appointment;
+import de.dhbw.fireinventory.adapter.application.appointment.AppointmentAppAdapter;
+import de.dhbw.fireinventory.adapter.application.item.ItemAppAdapter;
+import de.dhbw.fireinventory.adapter.application.location.LocationAppAdapter;
+import de.dhbw.fireinventory.adapter.application.vehicle.VehicleAppAdapter;
+import de.dhbw.fireinventory.application.domain.service.appointment.AppointmentResource;
+import de.dhbw.fireinventory.application.domain.service.location.LocationResource;
+import de.dhbw.fireinventory.application.domain.service.vehicle.VehicleResource;
 import de.dhbw.fireinventory.domain.condition.Condition;
-import de.dhbw.fireinventory.domain.equipment.Equipment;
 import de.dhbw.fireinventory.domain.status.Status;
-import de.dhbw.fireinventory.domain.location.Location;
-import de.dhbw.fireinventory.domain.vehicle.Vehicle;
 import de.dhbw.plugins.gui.vaadin.components.ErrorMessage;
 import de.dhbw.plugins.gui.vaadin.components.VehicleGrid;
 import de.dhbw.plugins.gui.vaadin.forms.*;
@@ -31,21 +30,21 @@ public class VehicleTabLayout extends AbstractTabLayout{
     TextField filterText = new TextField("Bezeichnung");
     HorizontalLayout filterLayout;
     VehicleForm vehicleForm;
-    LocationApplicationService locationService;
-    VehicleApplicationService vehicleService;
-    AppointmentApplicationService appointmentService;
-    ItemApplicationService itemService;
-    ComboBox<Location> locationComboBox;
+    LocationAppAdapter locationAppAdapter;
+    VehicleAppAdapter vehicleAppAdapter;
+    AppointmentAppAdapter appointmentAppAdapter;
+    ItemAppAdapter itemAppAdapter;
+    ComboBox<LocationResource> locationComboBox;
     ComboBox<Status> statusComboBox;
 
-    public VehicleTabLayout(LocationApplicationService locationService, ItemApplicationService itemService, VehicleApplicationService vehicleService, AppointmentApplicationService appointmentService)
+    public VehicleTabLayout(LocationAppAdapter locationAppAdapter, ItemAppAdapter itemAppAdapter, VehicleAppAdapter vehicleAppAdapter, AppointmentAppAdapter appointmentAppAdapter)
     {
         super();
 
-        this.itemService = itemService;
-        this.locationService = locationService;
-        this.vehicleService = vehicleService;
-        this.appointmentService = appointmentService;
+        this.itemAppAdapter = itemAppAdapter;
+        this.locationAppAdapter = locationAppAdapter;
+        this.vehicleAppAdapter = vehicleAppAdapter;
+        this.appointmentAppAdapter = appointmentAppAdapter;
 
         configureGrid();
         configureVehicleForm();
@@ -69,7 +68,7 @@ public class VehicleTabLayout extends AbstractTabLayout{
     }
 
     private void configureVehicleForm() {
-        vehicleForm = new VehicleForm(locationService.findAllPlaces(null));
+        vehicleForm = new VehicleForm(locationAppAdapter.findAllPlaces(null));
         vehicleForm.setWidth("25em");
         vehicleForm.addListener(VehicleForm.SaveEvent.class, this::saveVehicle);
         vehicleForm.addListener(VehicleForm.DeleteEvent.class, this::deleteVehicle);
@@ -77,14 +76,14 @@ public class VehicleTabLayout extends AbstractTabLayout{
     }
 
     protected void configureGrid() {
-        grid = new VehicleGrid(vehicleService);
-        grid.addListener(VehicleGrid.AddAppointmentEvent.class, e -> addAppointment(e.getVehicle()));
-        grid.addListener(VehicleGrid.EditVehicleEvent.class, e -> editVehicle(e.getVehicle()));
-        grid.addListener(VehicleGrid.VehicleConditionChangedEvent.class, e -> changeCondition(e.getVehicle()));
+        grid = new VehicleGrid(vehicleAppAdapter);
+        grid.addListener(VehicleGrid.AddAppointmentEvent.class, e -> addAppointment(e.getVehicleResource()));
+        grid.addListener(VehicleGrid.EditVehicleEvent.class, e -> editVehicle(e.getVehicleResource()));
+        grid.addListener(VehicleGrid.VehicleConditionChangedEvent.class, e -> changeCondition(e.getVehicleResource()));
     }
 
-    private void changeCondition(Vehicle vehicle) {
-        vehicleService.changeCondition(vehicle);
+    private void changeCondition(VehicleResource vehicleResource) {
+        vehicleAppAdapter.changeCondition(vehicleResource);
         updateList();
     }
 
@@ -97,11 +96,11 @@ public class VehicleTabLayout extends AbstractTabLayout{
         Icon filterIcon = new Icon(VaadinIcon.FILTER);
         filterIcon.addClickListener(e -> changeFilterVisibility());
 
-        Button addVehicleButton = new Button("Add Vehicle");
+        Button addVehicleButton = new Button("Fahrzeug hinzufügen");
 
-        locationComboBox = new ComboBox<>("Place");
-        locationComboBox.setItems(locationService.findAllPlaces(null));
-        locationComboBox.setItemLabelGenerator(Location::getDesignation);
+        locationComboBox = new ComboBox<>("Abstellort");
+        locationComboBox.setItems(locationAppAdapter.findAllPlaces(null));
+        locationComboBox.setItemLabelGenerator(LocationResource::getDesignation);
         locationComboBox.setClearButtonVisible(true);
         locationComboBox.addValueChangeListener(e -> updateList());
 
@@ -123,10 +122,10 @@ public class VehicleTabLayout extends AbstractTabLayout{
         return toolbar;
     }
 
-    private void addAppointment(Vehicle vehicle) {
-        Appointment appointment = new Appointment();
-        appointment.setItem(vehicle);
-        this.getUI().ifPresent(ui -> ui.navigate(Calendar.class).ifPresent(calendar -> calendar.editAppointment(appointment)));
+    private void addAppointment(VehicleResource vehicleResource) {
+        AppointmentResource appointmentResource = new AppointmentResource();
+        appointmentResource.setItemResource(vehicleResource);
+        this.getUI().ifPresent(ui -> ui.navigate(Calendar.class).ifPresent(calendar -> calendar.editAppointment(appointmentResource)));
     }
 
     private void changeFilterVisibility() {
@@ -138,22 +137,22 @@ public class VehicleTabLayout extends AbstractTabLayout{
 
     private void deleteVehicle(VehicleForm.DeleteEvent event) {
         try {
-            vehicleService.deleteVehicle(event.getVehicle());
+            vehicleAppAdapter.deleteVehicle(event.getVehicleResource());
             updateList();
             closeVehicleEditor();
             fireEvent(new GridUpdatedEvent(this));
         }
         catch (DataIntegrityViolationException exception) {
-            new ErrorMessage("You cannot delete this vehicle since there are still equipments attached.");
+            new ErrorMessage("Dieses Fahrzeug kann nicht gelöscht werden, da es noch verknüpfte Gerätschaften gibt.");
         }
 
     }
 
-    public void editVehicle(Vehicle vehicle) {
-        if (vehicle == null) {
+    public void editVehicle(VehicleResource vehicleResource) {
+        if (vehicleResource == null) {
             closeVehicleEditor();
         } else {
-            vehicleForm.setVehicle(vehicle);
+            vehicleForm.setVehicle(vehicleResource);
             vehicleForm.setVisible(true);
             addClassName("editing");
         }
@@ -167,7 +166,7 @@ public class VehicleTabLayout extends AbstractTabLayout{
 
     private void addVehicle() {
         grid.clearGridSelection();
-        editVehicle(new Vehicle());
+        editVehicle(new VehicleResource());
     }
 
     private void updateList() {
@@ -175,9 +174,9 @@ public class VehicleTabLayout extends AbstractTabLayout{
     }
 
     private void saveVehicle(VehicleForm.SaveEvent event) {
-        Vehicle vehicle = event.getVehicle();
+        VehicleResource vehicleResource = event.getVehicleResource();
         Condition conditionValue = vehicleForm.getConditionRadioButtonValue();
-        vehicleService.saveVehicle(vehicle, conditionValue);
+        vehicleAppAdapter.saveVehicle(vehicleResource, conditionValue);
         updateList();
         closeVehicleEditor();
         fireEvent(new GridUpdatedEvent(this));

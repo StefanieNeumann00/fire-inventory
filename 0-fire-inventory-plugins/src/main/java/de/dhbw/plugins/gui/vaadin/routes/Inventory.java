@@ -6,11 +6,11 @@ import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import de.dhbw.fireinventory.application.appointment.AppointmentApplicationService;
-import de.dhbw.fireinventory.application.equipment.EquipmentApplicationService;
-import de.dhbw.fireinventory.application.item.ItemApplicationService;
-import de.dhbw.fireinventory.application.location.LocationApplicationService;
-import de.dhbw.fireinventory.application.vehicle.VehicleApplicationService;
+import de.dhbw.fireinventory.adapter.application.appointment.AppointmentAppAdapter;
+import de.dhbw.fireinventory.adapter.application.equipment.EquipmentAppAdapter;
+import de.dhbw.fireinventory.adapter.application.item.ItemAppAdapter;
+import de.dhbw.fireinventory.adapter.application.location.LocationAppAdapter;
+import de.dhbw.fireinventory.adapter.application.vehicle.VehicleAppAdapter;
 import de.dhbw.fireinventory.domain.status.Status;
 import de.dhbw.plugins.gui.vaadin.MainLayout;
 import de.dhbw.plugins.gui.vaadin.tabs.EquipmentTabLayout;
@@ -19,14 +19,14 @@ import de.dhbw.plugins.gui.vaadin.tabs.VehicleTabLayout;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Route(value="", layout = MainLayout.class)
-@PageTitle("Overview | FireInventory")
+@PageTitle("Inventar | FireInventory")
 public class Inventory extends VerticalLayout {
 
-    EquipmentApplicationService equipmentService;
-    LocationApplicationService locationService;
-    VehicleApplicationService vehicleService;
-    AppointmentApplicationService appointmentService;
-    ItemApplicationService itemService;
+    EquipmentAppAdapter equipmentAppAdapter;
+    LocationAppAdapter locationAppAdapter;
+    VehicleAppAdapter vehicleAppAdapter;
+    AppointmentAppAdapter appointmentAppAdapter;
+    ItemAppAdapter itemAppAdapter;
 
     EquipmentTabLayout equipmentTabLayout;
     VehicleTabLayout vehicleTabLayout;
@@ -40,24 +40,24 @@ public class Inventory extends VerticalLayout {
     Tab locationTab;
 
     @Autowired
-    public Inventory(EquipmentApplicationService equipmentService, ItemApplicationService itemService, LocationApplicationService locationService,VehicleApplicationService vehicleService, AppointmentApplicationService appointmentService) {
-        this.equipmentService = equipmentService;
-        this.locationService = locationService;
-        this.vehicleService = vehicleService;
-        this.appointmentService = appointmentService;
-        this.itemService = itemService;
+    public Inventory(EquipmentAppAdapter equipmentAppAdapter, ItemAppAdapter itemAppAdapter, LocationAppAdapter locationAppAdapter, VehicleAppAdapter vehicleAppAdapter, AppointmentAppAdapter appointmentAppAdapter) {
+        this.equipmentAppAdapter = equipmentAppAdapter;
+        this.locationAppAdapter = locationAppAdapter;
+        this.vehicleAppAdapter = vehicleAppAdapter;
+        this.appointmentAppAdapter = appointmentAppAdapter;
+        this.itemAppAdapter = itemAppAdapter;
 
         setSizeFull();
         setHeightFull();
 
-        equipmentTab = new Tab(new Span("Equipments"));
-        vehiclesTab = new Tab(new Span("Vehicles"));
-        locationTab = new Tab(new Span("Places"));
+        equipmentTab = new Tab(new Span("Geräte"));
+        vehiclesTab = new Tab(new Span("Fahrzeuge"));
+        locationTab = new Tab(new Span("Räumlichkeiten"));
 
         configureLayouts();
-        equipmentBadge = createBadge(equipmentService.equipmentStatusCount(Status.KAPUTT));
+        equipmentBadge = createBadge(equipmentAppAdapter.equipmentStatusCount(Status.KAPUTT));
         equipmentBadge.addClickListener(e -> navigateToDestroyedEquipments());
-        vehicleBadge = createBadge(vehicleService.vehicleStatusCount(Status.KAPUTT));
+        vehicleBadge = createBadge(vehicleAppAdapter.vehicleStatusCount(Status.KAPUTT));
         vehicleBadge.addClickListener(e -> navigateToDestroyedVehicles());
         updateBadge();
 
@@ -68,13 +68,13 @@ public class Inventory extends VerticalLayout {
     }
 
     private void configureLayouts() {
-        equipmentTabLayout = new EquipmentTabLayout(equipmentService, locationService, itemService);
+        equipmentTabLayout = new EquipmentTabLayout(equipmentAppAdapter, locationAppAdapter, itemAppAdapter);
         equipmentTabLayout.addListener(EquipmentTabLayout.GridUpdatedEvent.class, e -> updateBadge());
 
-        vehicleTabLayout = new VehicleTabLayout(locationService, itemService, vehicleService, appointmentService);
+        vehicleTabLayout = new VehicleTabLayout(locationAppAdapter, itemAppAdapter, vehicleAppAdapter, appointmentAppAdapter);
         equipmentTabLayout.addListener(EquipmentTabLayout.GridUpdatedEvent.class, e -> updateBadge());
 
-        locationTabLayout = new LocationTabLayout(locationService);
+        locationTabLayout = new LocationTabLayout(locationAppAdapter);
     }
 
     private void navigateToDestroyedEquipments() {
@@ -88,8 +88,8 @@ public class Inventory extends VerticalLayout {
     }
 
     private void updateBadge() {
-        int destroyedEquipmentCount = equipmentService.equipmentStatusCount(Status.KAPUTT);
-        int destroyedVehicleCount = vehicleService.vehicleStatusCount(Status.KAPUTT);
+        int destroyedEquipmentCount = equipmentAppAdapter.equipmentStatusCount(Status.KAPUTT);
+        int destroyedVehicleCount = vehicleAppAdapter.vehicleStatusCount(Status.KAPUTT);
 
         equipmentTab.remove(equipmentBadge);
         vehiclesTab.remove(vehicleBadge);

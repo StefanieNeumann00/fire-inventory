@@ -15,51 +15,52 @@ import com.vaadin.flow.component.virtuallist.VirtualList;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.dom.ElementFactory;
 import com.vaadin.flow.shared.Registration;
+import de.dhbw.fireinventory.application.domain.service.appointment.AppointmentResource;
+import de.dhbw.fireinventory.application.domain.service.item.ItemResource;
+import de.dhbw.fireinventory.application.domain.service.vehicle.VehicleResource;
 import de.dhbw.fireinventory.domain.appointment.Appointment;
-import de.dhbw.fireinventory.domain.item.Item;
-import de.dhbw.fireinventory.domain.vehicle.Vehicle;
 
 import java.util.List;
 
 public class ListViewForm extends FormLayout {
 
-    VirtualList<Appointment> list;
+    VirtualList<AppointmentResource> list;
 
-    public ListViewForm(List<Appointment> appointments) {
+    public ListViewForm(List<AppointmentResource> appointmentResources) {
         list = new VirtualList<>();
-        setAppointments(appointments);
+        setAppointments(appointmentResources);
         add(list);
     }
 
-    public void setAppointments(List<Appointment> appointments) {
-        if (appointments != null) {
-            list.setItems(appointments);
+    public void setAppointments(List<AppointmentResource> appointmentResources) {
+        if (appointmentResources != null) {
+            list.setItems(appointmentResources);
             list.setRenderer(ListRenderer);
         }
     }
 
-    private ComponentRenderer<Component, Appointment> ListRenderer = new ComponentRenderer<>(
-            appointment -> {
+    private ComponentRenderer<Component, AppointmentResource> ListRenderer = new ComponentRenderer<>(
+            appointmentResource -> {
                 HorizontalLayout cardLayout = new HorizontalLayout();
                 cardLayout.setMargin(true);
 
-                Icon icon = getIcon(appointment.getItem());
+                Icon icon = getIcon(appointmentResource.getItemResource());
 
                 VerticalLayout infoLayout = new VerticalLayout();
                 infoLayout.setSpacing(false);
                 infoLayout.setPadding(false);
                 infoLayout.getElement().appendChild(
-                        ElementFactory.createStrong(appointment.getDueDate().toString()));
-                infoLayout.add(new Div(new Text(appointment.getDesignation())));
+                        ElementFactory.createStrong(appointmentResource.getDueDate().toString()));
+                infoLayout.add(new Div(new Text(appointmentResource.getDesignation())));
                 cardLayout.add(icon, infoLayout);
                 cardLayout.setAlignItems(FlexComponent.Alignment.CENTER);
 
-                cardLayout.addClickListener(e -> fireEvent(new SelectEvent(this, appointment)));
+                cardLayout.addClickListener(e -> fireEvent(new SelectEvent(this, appointmentResource)));
                 return cardLayout;
             });
 
-    private Icon getIcon(Item item) {
-        if (item instanceof Vehicle) {
+    private Icon getIcon(ItemResource itemResource) {
+        if (itemResource instanceof VehicleResource) {
             return new Icon(VaadinIcon.TRUCK);
         } else {
             return new Icon(VaadinIcon.HAMMER);
@@ -67,21 +68,21 @@ public class ListViewForm extends FormLayout {
     }
 
     public static abstract class ListViewFormEvent extends ComponentEvent<ListViewForm> {
-        private Appointment appointment;
+        private AppointmentResource appointmentResource;
 
-        protected ListViewFormEvent(ListViewForm source, Appointment appointment) {
+        protected ListViewFormEvent(ListViewForm source, AppointmentResource appointmentResource) {
             super(source, false);
-            this.appointment = appointment;
+            this.appointmentResource = appointmentResource;
         }
 
-        public Appointment getAppointment() {
-            return appointment;
+        public AppointmentResource getAppointmentResource() {
+            return appointmentResource;
         }
     }
 
     public static class SelectEvent extends ListViewForm.ListViewFormEvent {
-        SelectEvent(ListViewForm source, Appointment appointment) {
-            super(source, appointment);
+        SelectEvent(ListViewForm source, AppointmentResource appointmentResource) {
+            super(source, appointmentResource);
         }
     }
 

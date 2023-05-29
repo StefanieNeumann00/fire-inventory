@@ -1,13 +1,11 @@
 package de.dhbw.plugins.mockito;
 
-import de.dhbw.fireinventory.application.equipment.EquipmentApplicationService;
-import de.dhbw.fireinventory.application.vehicle.VehicleApplicationService;
+import de.dhbw.fireinventory.application.domain.service.item.ItemApplicationService;
 import de.dhbw.fireinventory.domain.condition.Condition;
 import de.dhbw.fireinventory.domain.equipment.Equipment;
 import de.dhbw.fireinventory.domain.item.ItemRepository;
 import de.dhbw.fireinventory.domain.location.InternalPlace;
 import de.dhbw.fireinventory.domain.location.Location;
-import de.dhbw.fireinventory.domain.location.LocationRepository;
 import de.dhbw.fireinventory.domain.location.VehiclePlace;
 import de.dhbw.fireinventory.domain.status.Status;
 import de.dhbw.fireinventory.domain.vehicle.Vehicle;
@@ -25,11 +23,11 @@ public class EquipmentTest {
     @Mock
     ItemRepository itemRepository;
 
-    EquipmentApplicationService applicationService;
+    ItemApplicationService applicationService;
 
     @Before
     public void initiate() {
-        applicationService = new EquipmentApplicationService(itemRepository);
+        applicationService = new ItemApplicationService(itemRepository);
     }
 
 
